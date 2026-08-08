@@ -18,6 +18,8 @@ import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { ref, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage } from '../../lib/firebase';
 import { JournalEntry } from '../../types';
+import { FIRESTORE_COLLECTION_ENTRIES, ROUTES } from '../../lib/constants';
+import { SAMPLE_ENTRY_DETAIL } from '../../lib/sampleData';
 
 export const EntryDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -40,7 +42,7 @@ export const EntryDetailPage: React.FC = () => {
       setLoading(true);
 
       try {
-        const docRef = doc(db, 'entries', id);
+        const docRef = doc(db, FIRESTORE_COLLECTION_ENTRIES, id);
         const snap = await getDoc(docRef);
 
         if (snap.exists()) {
@@ -60,19 +62,8 @@ export const EntryDetailPage: React.FC = () => {
           }
         } else {
           // Fallback data sampel jika ID adalah data dummy
-          const sampleData: JournalEntry = {
-            id: id || 'sample',
-            userId: 'demo',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            content: 'Tadi beli galon di warung sebelah, harganya 20rb. Cuaca lumayan panas tapi untung dapat es kelapa segar.',
-            transcriptRaw: 'Eee... tadi siang saya ke warung sebelah beli galon harganya dua puluh ribu...',
-            hasAudio: true,
-            mood: 'Senang',
-            tags: ['Harian', 'Belanja']
-          };
-          setEntry(sampleData);
-          setEditedContent(sampleData.content);
+          setEntry(SAMPLE_ENTRY_DETAIL);
+          setEditedContent(SAMPLE_ENTRY_DETAIL.content);
         }
       } catch (err) {
         console.error('Error fetching entry detail:', err);
@@ -90,7 +81,7 @@ export const EntryDetailPage: React.FC = () => {
     setIsSaving(true);
     try {
       if (!id.startsWith('sample')) {
-        const docRef = doc(db, 'entries', id);
+        const docRef = doc(db, FIRESTORE_COLLECTION_ENTRIES, id);
         await updateDoc(docRef, {
           content: editedContent,
           updatedAt: new Date().toISOString()
@@ -123,10 +114,10 @@ export const EntryDetailPage: React.FC = () => {
           }
         }
         // Hapus dokumen dari Firestore
-        const docRef = doc(db, 'entries', id);
+        const docRef = doc(db, FIRESTORE_COLLECTION_ENTRIES, id);
         await deleteDoc(docRef);
       }
-      navigate('/entries');
+      navigate(ROUTES.ENTRIES);
     } catch (err) {
       console.error('Error deleting entry:', err);
       alert('Gagal menghapus catatan.');
@@ -159,7 +150,7 @@ export const EntryDetailPage: React.FC = () => {
       <div className="p-6 text-center space-y-4">
         <p className="text-sm text-ink-muted">Catatan tidak ditemukan.</p>
         <button
-          onClick={() => navigate('/entries')}
+          onClick={() => navigate(ROUTES.ENTRIES)}
           className="text-xs font-semibold text-accent underline"
         >
           Kembali ke Daftar Catatan
@@ -183,7 +174,7 @@ export const EntryDetailPage: React.FC = () => {
       {/* Top Bar Navigation */}
       <div className="flex items-center justify-between">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(ROUTES.ENTRIES)}
           className="flex items-center gap-1 text-sm text-ink-muted hover:text-ink transition-colors font-mono"
         >
           <ArrowLeft className="w-4 h-4" />

@@ -1,12 +1,13 @@
 import { JournalEntry } from '../types';
+import { APP_FULL_NAME, APP_VERSION, LS_KEY_SETTINGS, EXPORT_FILE_PREFIX } from './constants';
 
 export function exportJournalDataAsJSON(entries: JournalEntry[]) {
-  const settingsStr = localStorage.getItem('gumam_settings');
+  const settingsStr = localStorage.getItem(LS_KEY_SETTINGS);
   const settings = settingsStr ? JSON.parse(settingsStr) : {};
 
   const exportPayload = {
-    app: 'Gumam PWA Voice Journaling',
-    version: '1.0.0',
+    app: APP_FULL_NAME,
+    version: APP_VERSION,
     exportedAt: new Date().toISOString(),
     settings,
     entriesCount: entries.length,
@@ -16,7 +17,7 @@ export function exportJournalDataAsJSON(entries: JournalEntry[]) {
   const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
   const downloadAnchor = document.createElement('a');
   downloadAnchor.setAttribute('href', dataStr);
-  downloadAnchor.setAttribute('download', `gumam_backup_${new Date().toISOString().split('T')[0]}.json`);
+  downloadAnchor.setAttribute('download', `${EXPORT_FILE_PREFIX}_${new Date().toISOString().split('T')[0]}.json`);
   document.body.appendChild(downloadAnchor);
   downloadAnchor.click();
   downloadAnchor.remove();

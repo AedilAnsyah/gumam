@@ -25,6 +25,8 @@ import { AudioWaveformVisualizer } from '../../components/AudioWaveformVisualize
 import { WaveformDecoration } from '../../components/WaveformDecoration';
 import { summarizeAudioWithGemini, GeminiProcessResult } from '../../lib/ai';
 import { saveJournalEntry } from '../../lib/entries';
+import { ROUTES } from '../../lib/constants';
+import { DEMO_AI_RESULT, PROMPT_STARTERS } from '../../lib/sampleData';
 
 type RecordState = 
   | 'idle' 
@@ -60,13 +62,6 @@ export const RecordPage: React.FC = () => {
   const timerRef = useRef<number | null>(null);
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
   const navigate = useNavigate();
-
-  const promptStarters = [
-    'Apa hal paling berkesan atau menyenangkan hari ini?',
-    'Apakah ada ide baru, rapat, atau keputusan penting?',
-    'Apa pembelian/pengeluaran kecil yang baru saja kamu lakukan?',
-    'Bagaimana perasaanmu sekarang dan apa targetmu esok hari?'
-  ];
 
   useEffect(() => {
     return () => {
@@ -162,12 +157,7 @@ export const RecordPage: React.FC = () => {
     } catch (err: any) {
       console.error('Gemini AI Process Error:', err);
       if (err.message?.includes('Google Gemini API Key belum diset')) {
-        const demoResult: GeminiProcessResult = {
-          transcriptRaw: 'Eee... tadi siang saya ke warung sebelah beli galon harganya dua puluh ribu terus cuaca panas banget tapi untung dapat es kelapa segar...',
-          summary: 'Membeli galon seharga Rp20.000 di warung sebelah. Cuaca lumayan panas tetapi merasa segar setelah menikmati es kelapa.',
-          mood: 'Senang',
-          tags: ['Harian', 'Belanja']
-        };
+        const demoResult = DEMO_AI_RESULT;
         setAiResult(demoResult);
         setEditedSummary(demoResult.summary);
         setRecordState('review');
@@ -210,7 +200,7 @@ export const RecordPage: React.FC = () => {
 
       setTimeout(() => {
         handleReset();
-        navigate('/entries');
+        navigate(ROUTES.ENTRIES);
       }, 1500);
     } catch (err: any) {
       console.error('Error saving journal entry:', err);
@@ -630,7 +620,7 @@ export const RecordPage: React.FC = () => {
               Pilih salah satu topik di bawah sebagai pemantik tulisan jurnalmu hari ini:
             </p>
             <div className="space-y-2.5">
-              {promptStarters.map((starter, idx) => (
+              {PROMPT_STARTERS.map((starter, idx) => (
                 <div
                   key={idx}
                   className="p-3 bg-canvas/70 border border-surface-alt/60 rounded-xl text-xs text-ink leading-relaxed hover:border-accent/30 transition-colors"

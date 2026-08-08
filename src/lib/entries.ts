@@ -13,6 +13,15 @@ import {
 import { ref, uploadBytes } from 'firebase/storage';
 import { db, storage, auth } from './firebase';
 import { JournalEntry, UserStreak } from '../types';
+import {
+  FIRESTORE_COLLECTION_ENTRIES,
+  FIRESTORE_COLLECTION_USERS,
+  FIRESTORE_SUBCOLLECTION_STREAK,
+  FIRESTORE_DOC_STREAK,
+  STORAGE_AUDIO_PREFIX,
+  MS_PER_DAY,
+  STREAK_INITIAL_COUNT,
+} from './constants';
 
 /**
  * Simpan catatan jurnal baru ke Firestore (collection entries)
@@ -49,14 +58,14 @@ export async function saveJournalEntry(params: {
     serverCreatedAt: serverTimestamp(),
   };
 
-  const entriesRef = collection(db, 'entries');
+  const entriesRef = collection(db, FIRESTORE_COLLECTION_ENTRIES);
   const docRef = await addDoc(entriesRef, entryData);
   const entryId = docRef.id;
 
   if (params.saveAudio && params.audioBlob) {
     try {
       const extension = params.audioBlob.type.includes('mp4') ? 'mp4' : 'webm';
-      const storagePath = `audio/${userId}/${entryId}.${extension}`;
+      const storagePath = `${STORAGE_AUDIO_PREFIX}/${userId}/${entryId}.${extension}`;
       const audioRef = ref(storage, storagePath);
       await uploadBytes(audioRef, params.audioBlob);
 
@@ -76,12 +85,12 @@ export async function saveJournalEntry(params: {
  * Update atau inisialisasi streak pengguna (termasuk logika Grace Day 1x/minggu)
  */
 export async function updateUserStreak(userId: string): Promise<UserStreak> {
-  const streakRef = doc(db, 'users', userId, 'streak', 'current');
+  const streakRef = doc(db, FIRESTORE_COLLECTION_USERS, userId, FIRESTORE_SUBCOLLECTION_STREAK, FIRESTORE_DOC_STREAK);
   const todayStr = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
 
   let streakData: UserStreak = {
-    currentStreak: 1,
-    bestStreak: 1,
+    currentStreak: STREAK_INITIAL_COUNT,
+    bestStreak: STREAK_INITIAL_COUNT,
     lastJournalDate: todayStr,
     graceUsedThisWeek: false,
   };
@@ -99,7 +108,7 @@ export async function updateUserStreak(userId: string): Promise<UserStreak> {
       } else if (lastDate) {
         const lastDateTime = new Date(lastDate).getTime();
         const todayTime = new Date(todayStr).getTime();
-        const diffDays = Math.round((todayTime - lastDateTime) / (1000 * 3600 * 24));
+        const diffDays = Math.round((todayTime - lastDateTime) / MS_PER_DAY);
 
         if (diffDays === 1) {
           // Mencatat berturut-turut
@@ -122,8 +131,8 @@ export async function updateUserStreak(userId: string): Promise<UserStreak> {
         } else {
           // Bolong >1 hari atau grace sudah terpakai -> reset ke 1
           streakData = {
-            currentStreak: 1,
-            bestStreak: Math.max(existing.bestStreak || 1, 1),
+            currentStreak: STREAK_INITIAL_COUNT,
+            bestStreak: Math.max(existing.bestStreak || STREAK_INITIAL_COUNT, STREAK_INITIAL_COUNT),
             lastJournalDate: todayStr,
             graceUsedThisWeek: false,
           };
@@ -149,7 +158,7 @@ export async function updateUserStreak(userId: string): Promise<UserStreak> {
 export async function getUserEntries(userId: string): Promise<JournalEntry[]> {
   try {
     const q = query(
-      collection(db, 'entries'),
+      collection(db, FIRESTORE_COLLECTION_ENTRIES),
       where('userId', '==', userId),
       orderBy('createdAt', 'desc')
     );

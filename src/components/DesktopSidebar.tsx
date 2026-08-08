@@ -2,13 +2,17 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Mic, BookOpen, Sparkles, Settings, Activity, PlusCircle } from 'lucide-react';
 import { StreakBadge } from '../features/streak/StreakBadge';
+import { APP_NAME, APP_TAGLINE, COMPETITION_NAME, ROUTES } from '../lib/constants';
+import { useStreak } from '../lib/useStreak';
 
 export const DesktopSidebar: React.FC = () => {
+  const { streak } = useStreak();
+
   const navItems = [
-    { to: '/', label: 'Rekam Suara', icon: Mic, desc: 'Mulai rekaman baru' },
-    { to: '/entries', label: 'Daftar Catatan', icon: BookOpen, desc: 'Arsip & kalender jurnal' },
-    { to: '/tanya', label: 'Tanya AI', icon: Sparkles, desc: 'Pencarian memori natural' },
-    { to: '/settings', label: 'Setelan App', icon: Settings, desc: 'Pengaturan & notifikasi' },
+    { to: ROUTES.HOME, label: 'Rekam Suara', icon: Mic, desc: 'Mulai rekaman baru' },
+    { to: ROUTES.ENTRIES, label: 'Daftar Catatan', icon: BookOpen, desc: 'Arsip & kalender jurnal' },
+    { to: ROUTES.TANYA, label: 'Tanya AI', icon: Sparkles, desc: 'Pencarian memori natural' },
+    { to: ROUTES.SETTINGS, label: 'Setelan App', icon: Settings, desc: 'Pengaturan & notifikasi' },
   ];
 
   return (
@@ -21,8 +25,8 @@ export const DesktopSidebar: React.FC = () => {
             <Mic className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="font-display font-bold text-xl text-ink tracking-tight">Gumam</h1>
-            <p className="text-[10px] font-mono text-ink-muted">Voice Journaling AI</p>
+            <h1 className="font-display font-bold text-xl text-ink tracking-tight">{APP_NAME}</h1>
+            <p className="text-[10px] font-mono text-ink-muted">{APP_TAGLINE}</p>
           </div>
         </div>
 
@@ -32,12 +36,12 @@ export const DesktopSidebar: React.FC = () => {
             <span className="font-mono text-[11px]">Status Consistencies</span>
             <Activity className="w-3.5 h-3.5 text-accent animate-pulse" />
           </div>
-          <StreakBadge streakCount={12} />
+          <StreakBadge streakCount={streak.currentStreak} />
         </div>
 
         {/* Quick Record Button */}
         <NavLink
-          to="/"
+          to={ROUTES.HOME}
           className="w-full bg-accent text-canvas font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-md shadow-accent/20 text-sm"
         >
           <PlusCircle className="w-4 h-4" />
@@ -52,7 +56,7 @@ export const DesktopSidebar: React.FC = () => {
               <NavLink
                 key={item.to}
                 to={item.to}
-                end={item.to === '/'}
+                end={item.to === ROUTES.HOME}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 ${
                     isActive
@@ -82,7 +86,7 @@ export const DesktopSidebar: React.FC = () => {
           <span>Firestore Auth</span>
           <span className="text-success font-semibold">Anonim Active</span>
         </div>
-        <div className="text-[10px] text-ink-muted/80">BitsMikro VibeCode 2026</div>
+        <div className="text-[10px] text-ink-muted/80">{COMPETITION_NAME}</div>
       </div>
     </aside>
   );

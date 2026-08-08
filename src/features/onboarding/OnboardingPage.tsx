@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Mic, ArrowRight, CheckCircle2, Bell, Sparkles } from 'lucide-react';
 import { RecFrequency } from '../../types';
 import { WaveformDecoration } from '../../components/WaveformDecoration';
+import { APP_NAME, LS_KEY_ONBOARDED, LS_KEY_SETTINGS, DEFAULT_FREQUENCY, DEFAULT_REMINDER_TIME, ROUTES } from '../../lib/constants';
 
 export const OnboardingPage: React.FC = () => {
   const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [frequency, setFrequency] = useState<RecFrequency>('1x/hari');
-  const [reminderTime, setReminderTime] = useState('20:00');
+  const [frequency, setFrequency] = useState<RecFrequency>(DEFAULT_FREQUENCY as RecFrequency);
+  const [reminderTime, setReminderTime] = useState(DEFAULT_REMINDER_TIME);
   const [notificationGranted, setNotificationGranted] = useState(false);
   const navigate = useNavigate();
 
@@ -35,9 +36,9 @@ export const OnboardingPage: React.FC = () => {
       isFirstTime: false,
       createdAt: new Date().toISOString()
     };
-    localStorage.setItem('gumam_onboarded', 'true');
-    localStorage.setItem('gumam_settings', JSON.stringify(userSettings));
-    navigate('/');
+    localStorage.setItem(LS_KEY_ONBOARDED, 'true');
+    localStorage.setItem(LS_KEY_SETTINGS, JSON.stringify(userSettings));
+    navigate(ROUTES.HOME);
   };
 
   return (
@@ -49,7 +50,7 @@ export const OnboardingPage: React.FC = () => {
       <div className="pt-4 space-y-2">
         <div className="flex items-center justify-between text-xs font-mono text-ink-muted">
           <span>Langkah {step} dari 3</span>
-          <span className="text-accent font-semibold">Gumam PWA</span>
+          <span className="text-accent font-semibold">{APP_NAME} PWA</span>
         </div>
         <div className="flex items-center gap-2">
           <div className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${step >= 1 ? 'bg-accent' : 'bg-surface-alt'}`} />
@@ -71,7 +72,7 @@ export const OnboardingPage: React.FC = () => {
                 Mencatat Secepat Bicara
               </h1>
               <p className="text-sm text-ink-muted leading-relaxed">
-                Gumam merapikan rekaman suara harianmu menjadi jurnal terstruktur berbasis AI, privat, dan tanpa friksi.
+                {APP_NAME} merapikan rekaman suara harianmu menjadi jurnal terstruktur berbasis AI, privat, dan tanpa friksi.
               </p>
             </div>
           </div>
@@ -200,7 +201,7 @@ export const OnboardingPage: React.FC = () => {
             onClick={handleFinish}
             className="w-full bg-accent text-canvas font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all shadow-lg shadow-accent/20"
           >
-            <span>Mulai Mencatat di Gumam</span>
+            <span>Mulai Mencatat di {APP_NAME}</span>
             <CheckCircle2 className="w-5 h-5" />
           </button>
         )}

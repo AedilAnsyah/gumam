@@ -6,6 +6,8 @@ import { getUserEntries } from '../../lib/entries';
 import { auth } from '../../lib/firebase';
 import { JournalEntry } from '../../types';
 import { WaveformDecoration } from '../../components/WaveformDecoration';
+import { APP_NAME } from '../../lib/constants';
+import { SAMPLE_ENTRIES, SAMPLE_SUGGESTIONS } from '../../lib/sampleData';
 
 export const SearchAskPage: React.FC = () => {
   const [question, setQuestion] = useState('');
@@ -13,37 +15,6 @@ export const SearchAskPage: React.FC = () => {
   const [isAsking, setIsAsking] = useState(false);
   const [aiAnswer, setAiAnswer] = useState<AskJournalResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const sampleSuggestions = [
-    'Terakhir beli galon kapan dan berapa harganya?',
-    'Apa saja hal menarik minggu ini?',
-    'Bagaimana progres proyek VibeCode?'
-  ];
-
-  const sampleEntries: JournalEntry[] = [
-    {
-      id: 'sample-1',
-      userId: 'demo',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      content: 'Tadi beli galon di warung sebelah, harganya 20rb. Cuaca lumayan panas tapi untung dapat es kelapa segar.',
-      transcriptRaw: 'Eee... tadi siang saya ke warung sebelah beli galon harganya dua puluh ribu...',
-      hasAudio: true,
-      mood: 'Senang',
-      tags: ['Harian', 'Belanja']
-    },
-    {
-      id: 'sample-2',
-      userId: 'demo',
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-      updatedAt: new Date(Date.now() - 86400000).toISOString(),
-      content: 'Rapat pagi berjalan lancar. Tim sepakat memakai arsitektur PWA berbasis AI untuk kompetisi VibeCode 2026.',
-      transcriptRaw: 'Rapat pagi tadi tim sepakat pakai arsitektur PWA...',
-      hasAudio: false,
-      mood: 'Fokus',
-      tags: ['Kerja', 'Proyek']
-    }
-  ];
 
   useEffect(() => {
     async function loadEntries() {
@@ -53,10 +24,10 @@ export const SearchAskPage: React.FC = () => {
         if (firestoreEntries.length > 0) {
           setEntries(firestoreEntries);
         } else {
-          setEntries(sampleEntries);
+          setEntries(SAMPLE_ENTRIES);
         }
       } else {
-        setEntries(sampleEntries);
+        setEntries(SAMPLE_ENTRIES);
       }
     }
 
@@ -93,7 +64,7 @@ export const SearchAskPage: React.FC = () => {
             <div className="absolute -right-4 -bottom-4 w-28 h-28 bg-accent/10 rounded-full blur-2xl pointer-events-none" />
             <div className="flex items-center gap-2 text-accent font-semibold text-sm mb-1.5">
               <Sparkles className="w-4 h-4 text-accent animate-pulse" />
-              <span>Tanya ke Gumam (AI Search)</span>
+              <span>{`Tanya ke ${APP_NAME} (AI Search)`}</span>
             </div>
             <p className="text-xs text-ink-muted leading-relaxed">
               Tanyakan apa saja tentang memori & catatan lamamu. AI akan mencari dan merangkum jawaban natural berdasarkan isi jurnalmu.
@@ -147,7 +118,7 @@ export const SearchAskPage: React.FC = () => {
             <div className="bg-surface border border-accent/40 rounded-3xl p-6 space-y-4 shadow-xl animate-fadeIn text-left">
               <div className="flex items-center gap-2 text-accent font-semibold text-xs border-b border-surface-alt/60 pb-3">
                 <Sparkles className="w-4 h-4" />
-                <span>Jawaban AI Gumam</span>
+                <span>{`Jawaban AI ${APP_NAME}`}</span>
               </div>
 
               <p className="text-sm text-ink leading-relaxed font-sans font-normal">
@@ -200,7 +171,7 @@ export const SearchAskPage: React.FC = () => {
               Klik pertanyaan di bawah untuk langsung menanyakannya ke AI:
             </p>
             <div className="flex flex-col gap-2.5">
-              {sampleSuggestions.map((item, idx) => (
+              {SAMPLE_SUGGESTIONS.map((item, idx) => (
                 <button
                   key={idx}
                   onClick={() => {

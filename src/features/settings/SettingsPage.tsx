@@ -6,10 +6,11 @@ import { useTheme } from '../../lib/theme';
 import { exportJournalDataAsJSON, importJournalDataFromJSON } from '../../lib/exportImport';
 import { getUserEntries } from '../../lib/entries';
 import { auth } from '../../lib/firebase';
+import { LS_KEY_SETTINGS, DEFAULT_FREQUENCY, DEFAULT_REMINDER_TIME } from '../../lib/constants';
 
 export const SettingsPage: React.FC = () => {
-  const [frequency, setFrequency] = useState<RecFrequency>('1x/hari');
-  const [reminderTime, setReminderTime] = useState('20:00');
+  const [frequency, setFrequency] = useState<RecFrequency>(DEFAULT_FREQUENCY as RecFrequency);
+  const [reminderTime, setReminderTime] = useState(DEFAULT_REMINDER_TIME);
   const [hasNotifPermission, setHasNotifPermission] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [entries, setEntries] = useState<JournalEntry[]>([]);
@@ -20,7 +21,7 @@ export const SettingsPage: React.FC = () => {
   useEffect(() => {
     setHasNotifPermission(isNotificationGranted());
 
-    const settingsStr = localStorage.getItem('gumam_settings');
+    const settingsStr = localStorage.getItem(LS_KEY_SETTINGS);
     if (settingsStr) {
       try {
         const parsed = JSON.parse(settingsStr);
@@ -47,7 +48,7 @@ export const SettingsPage: React.FC = () => {
       reminderTime,
       updatedAt: new Date().toISOString()
     };
-    localStorage.setItem('gumam_settings', JSON.stringify(newSettings));
+    localStorage.setItem(LS_KEY_SETTINGS, JSON.stringify(newSettings));
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 2000);
   };

@@ -1,4 +1,5 @@
 import { JournalEntry } from '../types';
+import { GEMINI_MODEL, GEMINI_API_BASE_URL, APP_NAME } from './constants';
 
 export interface GeminiProcessResult {
   transcriptRaw: string;
@@ -44,7 +45,7 @@ export async function summarizeAudioWithGemini(audioBlob: Blob): Promise<GeminiP
   const base64Audio = await blobToBase64(audioBlob);
   const mimeType = audioBlob.type || 'audio/webm';
 
-  const systemInstruction = `Kamu adalah asisten AI PWA Voice Journaling "Gumam". Kamu akan menerima rekaman suara seseorang yang sedang mencatat jurnal harian dalam Bahasa Indonesia.
+  const systemInstruction = `Kamu adalah asisten AI PWA Voice Journaling "${APP_NAME}". Kamu akan menerima rekaman suara seseorang yang sedang mencatat jurnal harian dalam Bahasa Indonesia.
 
 Tugasmu:
 1. Transkripsikan ucapan tersebut apa adanya.
@@ -58,7 +59,7 @@ Tugasmu:
   "tags": ["..."]
 }`;
 
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const apiUrl = `${GEMINI_API_BASE_URL}/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
   const response = await fetch(apiUrl, {
     method: 'POST',
@@ -168,7 +169,7 @@ Aturan Penting:
 
   const userPrompt = `PERTANYAAN USER: "${question}"\n\nKUMPULAN CATATAN JURNAL:\n${contextString}`;
 
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const apiUrl = `${GEMINI_API_BASE_URL}/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
   const response = await fetch(apiUrl, {
     method: 'POST',
@@ -231,7 +232,7 @@ export async function generateWeeklyRecapWithGemini(entries: JournalEntry[]): Pr
 
   const prompt = `Berikut adalah catatan jurnal pengguna selama minggu ini:\n${entriesText}\n\nBuat 1 paragraf ringkasan apresiatif dalam Bahasa Indonesia (2-3 kalimat) mengenai topik utama yang paling sering ditulis dan tren mood minggu ini (misal: "Minggu ini kamu paling sering menulis tentang...").`;
 
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const apiUrl = `${GEMINI_API_BASE_URL}/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
   const response = await fetch(apiUrl, {
     method: 'POST',

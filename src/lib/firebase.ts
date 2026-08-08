@@ -13,6 +13,12 @@ import {
   setDoc
 } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import {
+  LS_KEY_SETTINGS,
+  FIRESTORE_COLLECTION_USERS,
+  FIRESTORE_SUBCOLLECTION_SETTINGS,
+  FIRESTORE_DOC_SETTINGS,
+} from './constants';
 
 // Firebase Configuration (Ganti dengan config riil dari Firebase Console)
 const firebaseConfig = {
@@ -67,11 +73,17 @@ export function initAnonymousAuth(): Promise<User> {
  * Migrasikan settings dari localStorage ke Firestore (users/{userId}/settings/preferences)
  */
 export async function syncLocalSettingsToFirestore(userId: string) {
-  const localSettingsStr = localStorage.getItem('gumam_settings');
+  const localSettingsStr = localStorage.getItem(LS_KEY_SETTINGS);
   if (localSettingsStr) {
     try {
       const localSettings = JSON.parse(localSettingsStr);
-      const settingsRef = doc(db, 'users', userId, 'settings', 'preferences');
+      const settingsRef = doc(
+        db,
+        FIRESTORE_COLLECTION_USERS,
+        userId,
+        FIRESTORE_SUBCOLLECTION_SETTINGS,
+        FIRESTORE_DOC_SETTINGS
+      );
       await setDoc(settingsRef, {
         ...localSettings,
         updatedAt: new Date().toISOString()

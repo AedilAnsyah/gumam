@@ -11,11 +11,12 @@ import { SettingsPage } from './features/settings/SettingsPage';
 import { OnboardingPage } from './features/onboarding/OnboardingPage';
 import { initAnonymousAuth, syncLocalSettingsToFirestore } from './lib/firebase';
 import { scheduleLocalReminder } from './lib/notifications';
+import { ROUTES, PAGE_TITLES, LS_KEY_ONBOARDED, COMPETITION_NAME } from './lib/constants';
 
 const AppLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const isOnboarding = location.pathname === '/onboarding';
+  const isOnboarding = location.pathname === ROUTES.ONBOARDING;
 
   useEffect(() => {
     // Inisialisasi Firebase Anonymous Auth secara transparan di background
@@ -28,9 +29,9 @@ const AppLayout: React.FC = () => {
     scheduleLocalReminder();
 
     // Otomatis arahkan ke onboarding jika pengguna pertama kali membuka app
-    const onboarded = localStorage.getItem('gumam_onboarded');
-    if (!onboarded && location.pathname !== '/onboarding') {
-      navigate('/onboarding', { replace: true });
+    const onboarded = localStorage.getItem(LS_KEY_ONBOARDED);
+    if (!onboarded && location.pathname !== ROUTES.ONBOARDING) {
+      navigate(ROUTES.ONBOARDING, { replace: true });
     }
   }, [location.pathname, navigate]);
 
@@ -54,15 +55,12 @@ const AppLayout: React.FC = () => {
         <header className="hidden md:flex items-center justify-between px-8 py-4 bg-canvas/80 backdrop-blur-md border-b border-surface-alt/40 sticky top-0 z-30">
           <div className="flex items-center gap-3">
             <h2 className="font-display font-bold text-xl text-ink">
-              {location.pathname === '/' && 'Studio Rekaman Voice Journal'}
-              {location.pathname.startsWith('/entries') && 'Daftar Catatan & Kalender'}
-              {location.pathname === '/tanya' && 'Tanya AI (Natural Language Search)'}
-              {location.pathname === '/settings' && 'Setelan Aplikasi'}
+              {PAGE_TITLES[location.pathname] || (location.pathname.startsWith(ROUTES.ENTRIES) && PAGE_TITLES[ROUTES.ENTRIES]) || ''}
             </h2>
           </div>
           <div className="flex items-center gap-4 text-xs font-mono text-ink-muted">
             <span className="bg-surface border border-surface-alt px-3 py-1.5 rounded-xl">
-              BitsMikro Innovative VibeCode 2026
+              {COMPETITION_NAME}
             </span>
           </div>
         </header>
@@ -70,11 +68,11 @@ const AppLayout: React.FC = () => {
         {/* Main Content Area */}
         <main className="flex-1 p-4 md:p-8 max-w-5xl w-full mx-auto">
           <Routes>
-            <Route path="/" element={<RecordPage />} />
-            <Route path="/entries" element={<EntriesPage />} />
-            <Route path="/entries/:id" element={<EntryDetailPage />} />
-            <Route path="/tanya" element={<SearchAskPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
+            <Route path={ROUTES.HOME} element={<RecordPage />} />
+            <Route path={ROUTES.ENTRIES} element={<EntriesPage />} />
+            <Route path={ROUTES.ENTRY_DETAIL} element={<EntryDetailPage />} />
+            <Route path={ROUTES.TANYA} element={<SearchAskPage />} />
+            <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
           </Routes>
         </main>
 

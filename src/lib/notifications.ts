@@ -2,6 +2,19 @@
  * Modul Pengelolaan Reminder & Notifikasi Lokal PWA
  */
 
+import {
+  NOTIFICATION_ICON,
+  NOTIFICATION_TAG_TEST,
+  NOTIFICATION_TAG_DAILY,
+  NOTIFICATION_TITLE,
+  NOTIFICATION_BODY_TEST,
+  NOTIFICATION_BODY_DAILY,
+  LS_KEY_SETTINGS,
+  DEFAULT_REMINDER_TIME,
+  MS_PER_DAY,
+  ROUTES,
+} from './constants';
+
 export async function requestNotificationPermission(): Promise<boolean> {
   if (!('Notification' in window)) {
     alert('Browser ini tidak mendukung Web Notification API.');
@@ -31,13 +44,13 @@ export async function sendTestNotification() {
     return;
   }
 
-  const title = 'Waktunya Mencatat Harimu ✍️';
+  const title = NOTIFICATION_TITLE;
   const options: NotificationOptions = {
-    body: 'Bicarakan harimu di Gumam secara alami & pertahankan streak jurnalmu!',
-    icon: '/masked-icon.svg',
-    badge: '/masked-icon.svg',
-    tag: 'gumam-reminder-test',
-    data: { url: '/' }
+    body: NOTIFICATION_BODY_TEST,
+    icon: NOTIFICATION_ICON,
+    badge: NOTIFICATION_ICON,
+    tag: NOTIFICATION_TAG_TEST,
+    data: { url: ROUTES.HOME }
   };
 
   if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
@@ -55,11 +68,11 @@ export async function scheduleLocalReminder() {
   if (!isNotificationGranted()) return;
 
   try {
-    const settingsStr = localStorage.getItem('gumam_settings');
+    const settingsStr = localStorage.getItem(LS_KEY_SETTINGS);
     if (!settingsStr) return;
 
     const settings = JSON.parse(settingsStr);
-    const reminderTime = settings.reminderTime || '20:00';
+    const reminderTime = settings.reminderTime || DEFAULT_REMINDER_TIME;
     const [targetHour, targetMinute] = reminderTime.split(':').map(Number);
 
     const now = new Date();
@@ -74,15 +87,15 @@ export async function scheduleLocalReminder() {
     const timeUntilNotification = nextNotify.getTime() - now.getTime();
 
     // Set setTimeout lokal untuk sesi aktif (fallback browser)
-    if (timeUntilNotification > 0 && timeUntilNotification < 86400000) {
+    if (timeUntilNotification > 0 && timeUntilNotification < MS_PER_DAY) {
       setTimeout(async () => {
         if (isNotificationGranted()) {
-          const title = 'Waktunya Mencatat Harimu ✍️';
+          const title = NOTIFICATION_TITLE;
           const options: NotificationOptions = {
-            body: 'Saatnya merekam cerita harimu dan menjaga streak jurnal tetap berjalan!',
-            icon: '/masked-icon.svg',
-            tag: 'gumam-daily-reminder',
-            data: { url: '/' }
+            body: NOTIFICATION_BODY_DAILY,
+            icon: NOTIFICATION_ICON,
+            tag: NOTIFICATION_TAG_DAILY,
+            data: { url: ROUTES.HOME }
           };
 
           if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {

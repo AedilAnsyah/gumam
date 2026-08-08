@@ -6,6 +6,8 @@ import { JournalEntry } from '../../types';
 import { getUserEntries } from '../../lib/entries';
 import { auth } from '../../lib/firebase';
 import { generateWeeklyRecapWithGemini } from '../../lib/ai';
+import { ROUTES } from '../../lib/constants';
+import { SAMPLE_ENTRIES } from '../../lib/sampleData';
 
 export const EntriesPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
@@ -18,31 +20,6 @@ export const EntriesPage: React.FC = () => {
   const [weeklyRecap, setWeeklyRecap] = useState<string | null>(null);
   const [isGeneratingRecap, setIsGeneratingRecap] = useState(false);
 
-  const sampleEntries: JournalEntry[] = [
-    {
-      id: 'sample-1',
-      userId: 'demo',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      content: 'Tadi beli galon di warung sebelah, harganya 20rb. Cuaca lumayan panas tapi untung dapat es kelapa segar.',
-      transcriptRaw: 'Eee... tadi siang saya ke warung sebelah beli galon harganya dua puluh ribu...',
-      hasAudio: true,
-      mood: 'Senang',
-      tags: ['Harian', 'Belanja']
-    },
-    {
-      id: 'sample-2',
-      userId: 'demo',
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-      updatedAt: new Date(Date.now() - 86400000).toISOString(),
-      content: 'Rapat pagi berjalan lancar. Tim sepakat memakai arsitektur PWA berbasis AI untuk kompetisi VibeCode 2026.',
-      transcriptRaw: 'Rapat pagi tadi tim sepakat pakai arsitektur PWA...',
-      hasAudio: false,
-      mood: 'Fokus',
-      tags: ['Kerja', 'Proyek']
-    }
-  ];
-
   useEffect(() => {
     async function loadEntries() {
       setLoading(true);
@@ -52,10 +29,10 @@ export const EntriesPage: React.FC = () => {
         if (firestoreEntries.length > 0) {
           setEntries(firestoreEntries);
         } else {
-          setEntries(sampleEntries);
+          setEntries(SAMPLE_ENTRIES);
         }
       } else {
-        setEntries(sampleEntries);
+        setEntries(SAMPLE_ENTRIES);
       }
       setLoading(false);
     }
@@ -289,7 +266,7 @@ export const EntriesPage: React.FC = () => {
                 </p>
               </div>
               <Link
-                to="/"
+                to={ROUTES.HOME}
                 className="inline-flex items-center gap-2 bg-accent text-canvas font-bold px-5 py-3 rounded-xl text-xs hover:scale-105 transition-all shadow-md shadow-accent/20"
               >
                 <Plus className="w-4 h-4" />
