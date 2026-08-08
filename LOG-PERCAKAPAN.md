@@ -1,5 +1,6 @@
 # LOG PERCAKAPAN PROMPTING & IMPLEMENTASI — GUMAM
 **Kompetisi:** BitsMikro Innovative VibeCode 2026  
+**Tim Pengembang:** Tim Calon Manajer Kopdes  
 **Project:** Gumam (PWA Voice Journaling)  
 **Metode:** Incremental / Step-by-step Feature Implementation  
 **Tanggal Mulai:** 8 Agustus 2026  

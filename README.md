@@ -144,4 +144,4 @@ Seluruh riwayat prompting dan alur pemikiran perencanaan hingga implementasi per
 
 ---
 
-**Dikembangkan oleh Tim Gumam untuk BitsMikro Innovative VibeCode 2026.**
+**Dikembangkan oleh Tim Calon Manajer Kopdes untuk BitsMikro Innovative VibeCode 2026.**
