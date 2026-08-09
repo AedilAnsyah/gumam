@@ -1,19 +1,80 @@
 rules_version = '2';
+
+// =============================================================================
+// GUMAM — Firestore Security Rules
+// =============================================================================
+// Prinsip: Zero-trust by default. Semua akses DITOLAK kecuali secara eksplisit
+// diizinkan. Isolasi data antar-user ditegakkan di sisi server, bukan client.
+//
+// Cara deploy:
+//   firebase deploy --only firestore:rules
+//
+// Cara test rules secara lokal:
+//   firebase emulators:start --only firestore
+// =============================================================================
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Aturan untuk catatan jurnal (entries)
-    match /entries/{entryId} {
-      allow read, update, delete: if request.auth != null
-                                    && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null
-                     && request.auth.uid == request.resource.data.userId;
+    // ─── Helper Functions ────────────────────────────────────────────────────
+
+    /** Cek apakah user sudah terotentikasi (anonymous auth pun dianggap valid) */
+    function isAuthenticated() {
+      return request.auth != null;
     }
 
-    // Aturan untuk data spesifik pengguna (settings, streak, dll)
-    match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null
-                           && request.auth.uid == userId;
+    /** Cek apakah user yang request adalah pemilik resource yang sudah ada */
+    function isOwner() {
+      return request.auth.uid == resource.data.userId;
     }
+
+    /** Cek apakah dokumen baru yang dibuat memiliki userId yang sama dengan auth user */
+    function isCreatingOwnDocument() {
+      return request.auth.uid == request.resource.data.userId;
+    }
+
+    /** Cek apakah field userId tidak berubah saat update (immutable field) */
+    function userIdIsUnchanged() {
+      return request.resource.data.userId == resource.data.userId;
+    }
+
+    // ─── /entries/{entryId} ──────────────────────────────────────────────────
+    //
+    // Setiap dokumen entri wajib memiliki field `userId`.
+    // - Read/Update/Delete: hanya boleh jika userId di dokumen == auth.uid
+    // - Create: hanya boleh jika userId yang akan disimpan == auth.uid
+    // - Update: tidak boleh mengubah nilai userId (immutable)
+
+    match /entries/{entryId} {
+      allow read, delete: if isAuthenticated() && isOwner();
+
+      allow update: if isAuthenticated()
+                    && isOwner()
+                    && userIdIsUnchanged();   // Cegah "barter ownership"
+
+      allow create: if isAuthenticated()
+                    && isCreatingOwnDocument();
+    }
+
+    // ─── /users/{userId}/** ──────────────────────────────────────────────────
+    //
+    // Subcollection: settings, streak, dan dokumen user lain.
+    // Isolasi otomatis by-design karena userId ada di path-nya sendiri —
+    // tidak perlu cek field, cukup cocokkan path {userId} dengan auth.uid.
+    //
+    // Ini mencakup semua path di bawah /users/{userId}/:
+    //   - /users/{userId}/settings/preferences
+    //   - /users/{userId}/streak/current
+    //   - dsb.
+
+    match /users/{userId}/{document=**} {
+      allow read, write: if isAuthenticated()
+                         && request.auth.uid == userId;
+    }
+
+    // ─── Semua path lain: DITOLAK secara default ─────────────────────────────
+    // (Tidak perlu ditulis eksplisit — Firestore menolak semua yang tidak
+    //  diizinkan di atas. Tapi baik untuk dipahami sebagai prinsip zero-trust.)
+
   }
 }

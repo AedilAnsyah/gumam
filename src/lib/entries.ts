@@ -1,37 +1,36 @@
-import { 
-  collection, 
-  addDoc, 
-  doc, 
-  getDoc, 
-  setDoc, 
+import {
+  collection,
+  addDoc,
+  doc,
+  getDoc,
+  setDoc,
   serverTimestamp,
   getDocs,
   query,
   where,
   orderBy
 } from 'firebase/firestore';
-import { ref, uploadBytes } from 'firebase/storage';
-import { db, storage, auth } from './firebase';
+import { db, auth } from './firebase';
 import { JournalEntry, UserStreak } from '../types';
 import {
   FIRESTORE_COLLECTION_ENTRIES,
   FIRESTORE_COLLECTION_USERS,
   FIRESTORE_SUBCOLLECTION_STREAK,
   FIRESTORE_DOC_STREAK,
-  STORAGE_AUDIO_PREFIX,
   MS_PER_DAY,
   STREAK_INITIAL_COUNT,
 } from './constants';
 
 /**
- * Simpan catatan jurnal baru ke Firestore (collection entries)
- * dan upload file audio ke Firebase Storage jika diminta user.
+ * Simpan catatan jurnal baru ke Firestore.
+ *
+ * Audio TIDAK disimpan ke Firebase Storage — blob hanya dikirim ke Gemini API
+ * untuk transkripsi, lalu dibuang dari memori. Hanya teks hasil AI dan
+ * metadata yang dipersistensikan ke Firestore.
  */
 export async function saveJournalEntry(params: {
   content: string;
   transcriptRaw?: string;
-  audioBlob?: Blob | null;
-  saveAudio: boolean;
   source: 'voice' | 'manual';
   mood?: string | null;
   tags?: string[];
@@ -50,8 +49,9 @@ export async function saveJournalEntry(params: {
     updatedAt: nowIso,
     content: params.content,
     transcriptRaw: params.transcriptRaw || '',
-    hasAudio: params.saveAudio && !!params.audioBlob,
-    audioStoragePath: null as string | null,
+    // hasAudio selalu false — audio tidak disimpan, hanya diproses Gemini lalu dibuang
+    hasAudio: false,
+    audioStoragePath: null,
     source: params.source,
     mood: params.mood || null,
     tags: params.tags || [],
@@ -61,19 +61,6 @@ export async function saveJournalEntry(params: {
   const entriesRef = collection(db, FIRESTORE_COLLECTION_ENTRIES);
   const docRef = await addDoc(entriesRef, entryData);
   const entryId = docRef.id;
-
-  if (params.saveAudio && params.audioBlob) {
-    try {
-      const extension = params.audioBlob.type.includes('mp4') ? 'mp4' : 'webm';
-      const storagePath = `${STORAGE_AUDIO_PREFIX}/${userId}/${entryId}.${extension}`;
-      const audioRef = ref(storage, storagePath);
-      await uploadBytes(audioRef, params.audioBlob);
-
-      await setDoc(docRef, { audioStoragePath: storagePath }, { merge: true });
-    } catch (err) {
-      console.error('Gagal mengupload audio ke Storage:', err);
-    }
-  }
 
   // Update Streak dengan dukungan Grace Day
   await updateUserStreak(userId);

@@ -1,22 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Mic, 
-  Square, 
-  Play, 
-  Pause, 
-  RotateCcw, 
-  Edit3, 
-  AlertCircle, 
-  CheckCircle2, 
-  Sparkles, 
-  Loader2, 
-  Smile, 
-  Tag, 
-  ChevronDown, 
+import {
+  Mic,
+  Square,
+  Play,
+  Pause,
+  RotateCcw,
+  Edit3,
+  AlertCircle,
+  CheckCircle2,
+  Sparkles,
+  Loader2,
+  Smile,
+  Tag,
+  ChevronDown,
   ChevronUp,
-  Volume2,
-  VolumeX,
   Flame,
   HelpCircle,
   Lightbulb
@@ -52,8 +50,7 @@ export const RecordPage: React.FC = () => {
   const [showTranscript, setShowTranscript] = useState(false);
   const [manualText, setManualText] = useState('');
 
-  // Modal Simpan & Loading State
-  const [showSaveModal, setShowSaveModal] = useState(false);
+  // Loading State
   const [isSaving, setIsSaving] = useState(false);
   const [streakSuccessToast, setStreakSuccessToast] = useState(false);
 
@@ -169,15 +166,11 @@ export const RecordPage: React.FC = () => {
   };
 
   const handleInitiateSave = () => {
-    if (recordState === 'review' && audioBlob) {
-      setShowSaveModal(true);
-    } else {
-      executeSave(false);
-    }
+    // Audio tidak disimpan — langsung simpan teks ke Firestore tanpa modal
+    executeSave();
   };
 
-  const executeSave = async (saveAudio: boolean) => {
-    setShowSaveModal(false);
+  const executeSave = async () => {
     setIsSaving(true);
     setErrorMessage(null);
 
@@ -185,11 +178,11 @@ export const RecordPage: React.FC = () => {
       const content = recordState === 'manual' ? manualText : editedSummary;
       const source = recordState === 'manual' ? 'manual' : 'voice';
 
+      // Audio tidak diteruskan ke sini — blob sudah dikirim ke Gemini API
+      // di step sebelumnya dan tidak perlu disimpan ke Storage
       await saveJournalEntry({
         content,
         transcriptRaw: aiResult?.transcriptRaw,
-        audioBlob: saveAudio ? audioBlob : null,
-        saveAudio,
         source,
         mood: aiResult?.mood,
         tags: aiResult?.tags,
@@ -647,44 +640,6 @@ export const RecordPage: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* MODAL KONFIRMASI SIMPAN AUDIO */}
-      {showSaveModal && (
-        <div className="fixed inset-0 z-50 bg-canvas/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-surface border border-accent/30 rounded-2xl p-6 max-w-xs w-full space-y-4 text-center shadow-2xl animate-scaleIn">
-            <div className="w-12 h-12 rounded-full bg-accent-soft text-accent flex items-center justify-center mx-auto">
-              <Volume2 className="w-6 h-6" />
-            </div>
-
-            <div className="space-y-1">
-              <h3 className="font-display font-bold text-lg text-ink">
-                Simpan Rekaman Suara Asli?
-              </h3>
-              <p className="text-xs text-ink-muted leading-relaxed">
-                Kamu dapat menyimpan file audio ke cloud untuk diputar kembali nanti, atau hanya menyimpan teks rangkuman.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-2 pt-2">
-              <button
-                onClick={() => executeSave(true)}
-                className="w-full bg-accent text-canvas text-xs font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-md shadow-accent/20"
-              >
-                <Volume2 className="w-4 h-4" />
-                <span>Ya, Simpan Audio & Teks</span>
-              </button>
-
-              <button
-                onClick={() => executeSave(false)}
-                className="w-full bg-surface-alt hover:bg-surface-alt/80 text-ink text-xs font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors"
-              >
-                <VolumeX className="w-4 h-4 text-ink-muted" />
-                <span>Tidak, Simpan Teks Saja</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
