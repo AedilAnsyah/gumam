@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, Send, ArrowRight, BookOpen, AlertCircle, Loader2, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { askJournalWithGemini, AskJournalResult } from '../../lib/ai';
+import { askJournalAI, AskJournalResult } from '../../lib/ai';
 import { getUserEntries } from '../../lib/entries';
 import { auth } from '../../lib/firebase';
 import { JournalEntry } from '../../types';
@@ -43,7 +43,12 @@ export const SearchAskPage: React.FC = () => {
     setAiAnswer(null);
 
     try {
-      const result = await askJournalWithGemini(q, entries);
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error('Anda harus login untuk menggunakan fitur ini.');
+      }
+      
+      const result = await askJournalAI(user.uid, q);
       setAiAnswer(result);
     } catch (err: any) {
       console.error('Error asking Gemini AI:', err);

@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  Trash2, 
-  Edit2, 
-  Play, 
-  Pause, 
-  Volume2, 
-  CheckCircle2, 
-  Loader2, 
-  ChevronDown, 
-  ChevronUp, 
-  Tag, 
-  Smile 
+import {
+  ArrowLeft,
+  Trash2,
+  Edit2,
+  CheckCircle2,
+  Loader2,
+  ChevronDown,
+  ChevronUp,
+  Tag,
+  Smile
 } from 'lucide-react';
 import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { ref, getDownloadURL, deleteObject } from 'firebase/storage';
-import { db, storage } from '../../lib/firebase';
+import { db } from '../../lib/firebase';
 import { JournalEntry } from '../../types';
 import { FIRESTORE_COLLECTION_ENTRIES, ROUTES } from '../../lib/constants';
 import { SAMPLE_ENTRY_DETAIL } from '../../lib/sampleData';
@@ -27,14 +23,10 @@ export const EntryDetailPage: React.FC = () => {
 
   const [entry, setEntry] = useState<JournalEntry | null>(null);
   const [loading, setLoading] = useState(true);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState('');
   const [showTranscript, setShowTranscript] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-
-  const audioRef = React.useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     async function fetchEntryDetail() {
@@ -49,17 +41,6 @@ export const EntryDetailPage: React.FC = () => {
           const entryData = { id: snap.id, ...snap.data() } as JournalEntry;
           setEntry(entryData);
           setEditedContent(entryData.content);
-
-          // Fetch audio URL jika ada
-          if (entryData.hasAudio && entryData.audioStoragePath) {
-            try {
-              const storageRef = ref(storage, entryData.audioStoragePath);
-              const url = await getDownloadURL(storageRef);
-              setAudioUrl(url);
-            } catch (err) {
-              console.warn('Gagal mengambil audio URL dari Storage:', err);
-            }
-          }
         } else {
           // Fallback data sampel jika ID adalah data dummy
           setEntry(SAMPLE_ENTRY_DETAIL);
@@ -104,16 +85,7 @@ export const EntryDetailPage: React.FC = () => {
 
     try {
       if (!id.startsWith('sample')) {
-        // Hapus file audio dari Storage jika ada
-        if (entry.hasAudio && entry.audioStoragePath) {
-          try {
-            const storageRef = ref(storage, entry.audioStoragePath);
-            await deleteObject(storageRef);
-          } catch (err) {
-            console.warn('Audio storage file deletion warning:', err);
-          }
-        }
-        // Hapus dokumen dari Firestore
+        // Audio tidak disimpan di Storage, cukup hapus dokumen Firestore
         const docRef = doc(db, FIRESTORE_COLLECTION_ENTRIES, id);
         await deleteDoc(docRef);
       }
@@ -121,18 +93,6 @@ export const EntryDetailPage: React.FC = () => {
     } catch (err) {
       console.error('Error deleting entry:', err);
       alert('Gagal menghapus catatan.');
-    }
-  };
-
-  // Toggle Audio Playback
-  const togglePlay = () => {
-    if (!audioRef.current || !audioUrl) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      audioRef.current.play();
-      setIsPlaying(true);
     }
   };
 
@@ -163,16 +123,6 @@ export const EntryDetailPage: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-20 md:pb-8">
-      {/* Hidden Audio Player */}
-      {audioUrl && (
-        <audio
-          ref={audioRef}
-          src={audioUrl}
-          onEnded={() => setIsPlaying(false)}
-          className="hidden"
-        />
-      )}
-
       {/* Top Bar Navigation */}
       <div className="flex items-center justify-between">
         <button
@@ -207,33 +157,6 @@ export const EntryDetailPage: React.FC = () => {
           <span className="neu-pill px-3 py-1 text-accent font-semibold">Catatan Jurnal</span>
           <span>{new Date(entry.createdAt).toLocaleString('id-ID')}</span>
         </div>
-
-        {/* Audio Player if available */}
-        {entry.hasAudio && audioUrl && (
-          <div className="neu-inset rounded-2xl p-4 flex items-center gap-4">
-            <button
-              onClick={togglePlay}
-              className="w-12 h-12 rounded-full neu-raised hover:neu-inset active:neu-inset text-accent flex items-center justify-center shrink-0 transition-all cursor-pointer"
-            >
-              {isPlaying ? (
-                <Pause className="w-5 h-5 fill-current" />
-              ) : (
-                <Play className="w-5 h-5 fill-current ml-0.5" />
-              )}
-            </button>
-            <div className="flex-1">
-              <div className="flex items-center justify-between text-xs font-mono text-ink mb-1.5">
-                <span className="flex items-center gap-1.5 text-accent font-semibold">
-                  <Volume2 className="w-4 h-4" /> Rekaman Suara Asli
-                </span>
-              </div>
-              <div className="w-full neu-inset-sm h-2 rounded-full overflow-hidden bg-surface-alt">
-                <div className={`bg-accent h-full rounded-full ${isPlaying ? 'w-full transition-all duration-1000' : 'w-1/3'}`} />
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Content Section (View or Edit Mode) */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
