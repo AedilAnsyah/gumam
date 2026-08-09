@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mic, ArrowRight, CheckCircle2, Bell, Sparkles } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Bell, Sparkles } from 'lucide-react';
+import { GumamLogo } from '../../components/GumamLogo';
 import { RecFrequency } from '../../types';
 import { WaveformDecoration } from '../../components/WaveformDecoration';
 import { APP_NAME, LS_KEY_ONBOARDED, LS_KEY_SETTINGS, DEFAULT_FREQUENCY, DEFAULT_REMINDER_TIME, ROUTES } from '../../lib/constants';
@@ -42,20 +43,17 @@ export const OnboardingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-canvas text-ink flex flex-col justify-between p-6 max-w-md mx-auto relative overflow-hidden shadow-2xl">
-      {/* Background Subtle Gradient Glow */}
-      <div className="absolute top-10 right-10 w-64 h-64 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
-
+    <div className="min-h-screen bg-canvas text-ink flex flex-col justify-between p-6 max-w-md mx-auto relative overflow-hidden text-left">
       {/* Stepper Header */}
-      <div className="pt-4 space-y-2">
+      <div className="pt-4 space-y-3">
         <div className="flex items-center justify-between text-xs font-mono text-ink-muted">
-          <span>Langkah {step} dari 3</span>
-          <span className="text-accent font-semibold">{APP_NAME} PWA</span>
+          <span className="neu-pill px-3 py-1 text-accent font-semibold">Langkah {step} dari 3</span>
+          <span className="text-ink font-semibold">{APP_NAME} PWA</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${step >= 1 ? 'bg-accent' : 'bg-surface-alt'}`} />
-          <div className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${step >= 2 ? 'bg-accent' : 'bg-surface-alt'}`} />
-          <div className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${step >= 3 ? 'bg-accent' : 'bg-surface-alt'}`} />
+        <div className="flex items-center gap-2 neu-inset-sm p-1 rounded-full">
+          <div className={`h-2 flex-1 rounded-full transition-all duration-300 ${step >= 1 ? 'bg-accent shadow-sm' : 'bg-transparent'}`} />
+          <div className={`h-2 flex-1 rounded-full transition-all duration-300 ${step >= 2 ? 'bg-accent shadow-sm' : 'bg-transparent'}`} />
+          <div className={`h-2 flex-1 rounded-full transition-all duration-300 ${step >= 3 ? 'bg-accent shadow-sm' : 'bg-transparent'}`} />
         </div>
       </div>
 
@@ -63,12 +61,10 @@ export const OnboardingPage: React.FC = () => {
       {step === 1 && (
         <div className="my-auto space-y-6 animate-fadeIn">
           <div className="space-y-4">
-            <div className="w-16 h-16 rounded-3xl bg-accent-soft border border-accent/30 text-accent flex items-center justify-center shadow-lg shadow-accent/10">
-              <Mic className="w-8 h-8" />
-            </div>
+            <GumamLogo size="lg" animated={true} />
 
             <div className="space-y-2">
-              <h1 className="font-display text-3xl font-bold text-ink leading-tight">
+              <h1 className="font-display text-3xl font-bold text-ink leading-tight tracking-tight">
                 Mencatat Secepat Bicara
               </h1>
               <p className="text-sm text-ink-muted leading-relaxed">
@@ -90,14 +86,14 @@ export const OnboardingPage: React.FC = () => {
               <button
                 key={option.id}
                 onClick={() => setFrequency(option.id as RecFrequency)}
-                className={`w-full p-4 rounded-2xl border text-left flex items-start justify-between transition-all duration-200 ${
+                className={`w-full p-4 rounded-2xl text-left flex items-start justify-between transition-all duration-200 cursor-pointer ${
                   frequency === option.id
-                    ? 'bg-accent-soft/60 border-accent text-ink shadow-md shadow-accent/5'
-                    : 'bg-surface border-surface-alt/70 text-ink-muted hover:border-accent/40 hover:text-ink'
+                    ? 'neu-inset text-ink scale-[0.98]'
+                    : 'neu-raised-sm text-ink-muted hover:text-ink'
                 }`}
               >
                 <div>
-                  <div className={`font-semibold text-sm ${frequency === option.id ? 'text-accent' : 'text-ink'}`}>
+                  <div className={`font-semibold text-sm ${frequency === option.id ? 'text-accent font-bold' : 'text-ink'}`}>
                     {option.label}
                   </div>
                   <div className="text-xs text-ink-muted mt-0.5">{option.desc}</div>
@@ -113,10 +109,10 @@ export const OnboardingPage: React.FC = () => {
       {step === 2 && (
         <div className="my-auto space-y-6 animate-fadeIn">
           <div className="space-y-2">
-            <div className="w-14 h-14 rounded-2xl bg-accent-soft/60 border border-accent/20 text-accent flex items-center justify-center mb-3">
+            <div className="w-14 h-14 rounded-2xl neu-raised text-accent flex items-center justify-center mb-3">
               <Bell className="w-7 h-7" />
             </div>
-            <h2 className="font-display text-2xl font-bold text-ink">
+            <h2 className="font-display text-2xl font-bold text-ink tracking-tight">
               Atur Jam Notifikasi
             </h2>
             <p className="text-sm text-ink-muted leading-relaxed">
@@ -124,7 +120,7 @@ export const OnboardingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-surface border border-surface-alt rounded-2xl p-6 text-center space-y-4 shadow-sm">
+          <div className="neu-card p-6 text-center space-y-4">
             <label className="block text-xs font-mono text-ink-muted uppercase tracking-wider">
               Pilih Waktu Reminder
             </label>
@@ -132,13 +128,13 @@ export const OnboardingPage: React.FC = () => {
               type="time"
               value={reminderTime}
               onChange={(e) => setReminderTime(e.target.value)}
-              className="bg-canvas border border-accent/40 rounded-2xl px-6 py-4 text-3xl font-mono text-accent text-center focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+              className="neu-inset rounded-2xl px-6 py-4 text-3xl font-mono text-accent text-center focus:outline-none focus:ring-1 focus:ring-accent/40 bg-transparent w-full"
             />
           </div>
 
-          <div className="bg-surface-alt/50 border border-surface-alt rounded-2xl p-4 flex items-center justify-between gap-3">
+          <div className="neu-card-sm p-4 flex items-center justify-between gap-3">
             <div className="space-y-1">
-              <div className="text-xs font-semibold text-ink">Izin Push Notification</div>
+              <div className="text-xs font-bold text-ink">Izin Push Notification</div>
               <div className="text-[11px] text-ink-muted leading-tight">
                 Notifikasi dikirim secara lokal langsung di browser HP kamu.
               </div>
@@ -146,10 +142,10 @@ export const OnboardingPage: React.FC = () => {
             <button
               onClick={handleRequestNotification}
               disabled={notificationGranted}
-              className={`shrink-0 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+              className={`shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 notificationGranted
-                  ? 'bg-success/20 text-success border border-success/30'
-                  : 'bg-accent text-canvas hover:scale-105 active:scale-95'
+                  ? 'neu-inset-sm text-success'
+                  : 'neu-button text-accent'
               }`}
             >
               {notificationGranted ? 'Diizinkan ✓' : 'Izinkan'}
@@ -161,12 +157,12 @@ export const OnboardingPage: React.FC = () => {
       {/* STEP 3: Konfirmasi Siap & Value Banner */}
       {step === 3 && (
         <div className="my-auto space-y-6 animate-fadeIn text-center">
-          <div className="w-20 h-20 rounded-full bg-accent/15 border-2 border-accent text-accent flex items-center justify-center mx-auto shadow-xl shadow-accent/20">
-            <Sparkles className="w-10 h-10 animate-pulse" />
+          <div className="w-20 h-20 rounded-full neu-raised text-accent flex items-center justify-center mx-auto">
+            <Sparkles className="w-9 h-9" />
           </div>
 
           <div className="space-y-2">
-            <h2 className="font-display text-3xl font-bold text-ink">
+            <h2 className="font-display text-3xl font-bold text-ink tracking-tight">
               Kamu Siap Mencatat!
             </h2>
             <p className="text-sm text-ink-muted leading-relaxed max-w-xs mx-auto">
@@ -174,9 +170,9 @@ export const OnboardingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-surface border border-accent/20 rounded-2xl p-5 space-y-3">
+          <div className="neu-card p-6 space-y-3 text-center">
             <WaveformDecoration bars={20} active={true} className="h-8" />
-            <div className="text-xs font-mono text-accent font-semibold">
+            <div className="text-xs font-mono text-accent font-bold">
               Privasi Terjamin • Firestore Security Rules
             </div>
             <p className="text-[11px] text-ink-muted">
@@ -191,7 +187,7 @@ export const OnboardingPage: React.FC = () => {
         {step < 3 ? (
           <button
             onClick={() => setStep((prev) => (prev + 1) as 2 | 3)}
-            className="w-full bg-accent text-canvas font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all shadow-lg shadow-accent/20"
+            className="w-full neu-button text-accent font-bold py-4 rounded-2xl flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>Lanjutkan</span>
             <ArrowRight className="w-4 h-4" />
@@ -199,10 +195,10 @@ export const OnboardingPage: React.FC = () => {
         ) : (
           <button
             onClick={handleFinish}
-            className="w-full bg-accent text-canvas font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all shadow-lg shadow-accent/20"
+            className="w-full neu-button text-accent font-bold py-4 rounded-2xl flex items-center justify-center gap-2 cursor-pointer text-sm"
           >
             <span>Mulai Mencatat di {APP_NAME}</span>
-            <CheckCircle2 className="w-5 h-5" />
+            <CheckCircle2 className="w-5 h-5 text-accent" />
           </button>
         )}
       </div>

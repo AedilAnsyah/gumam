@@ -1,53 +1,64 @@
-# 🎙️ Gumam — PWA Voice Journaling Berbasis AI
+# 🎙️ Gumam — PWA Voice Journaling Berbasis AI (Neumorphic Soft UI)
 
 > **Kompetisi:** BitsMikro Innovative VibeCode 2026  
 > **Tema:** Kesehatan & Produktivitas  
 > **Cakupan Pengembangan:** Front-End Only (Backend-as-a-Service Firebase + Gemini AI REST API, 100% Gratis)  
 
-![Gumam PWA Banner](https://img.shields.io/badge/Gumam-Voice%20Journaling%20AI-76ABAE?style=for-the-badge)
-![BitsMikro 2026](https://img.shields.io/badge/BitsMikro-VibeCode%202026-222831?style=for-the-badge)
+![Gumam PWA Banner](https://img.shields.io/badge/Gumam-Voice%20Journaling%20AI-3B828E?style=for-the-badge)
+![BitsMikro 2026](https://img.shields.io/badge/BitsMikro-VibeCode%202026-1E232B?style=for-the-badge)
+![Style](https://img.shields.io/badge/Style-Neumorphism%20(Soft%20UI)-E4E8EE?style=for-the-badge)
 ![Tech Stack](https://img.shields.io/badge/Stack-React%20%7C%20Vite%20%7C%20TS%20%7C%20Tailwind-blue?style=for-the-badge)
 
 ---
 
 ## 📖 Tentang Project
 
-**Gumam** adalah Progressive Web App (PWA) *voice journaling* berbasis AI yang dirancang untuk meminimalkan friksi mencatat harian. Cukup dengan bicarakan harimu secara alami, **Google Gemini 2.5 Flash Multimodal Engine** akan mentranskripsi ucapan dan merapikan ceritamu menjadi catatan jurnal yang terstruktur, rapi, dan mudah ditelusuri kembali tanpa menghilangkan fakta atau detail spesifik.
+**Gumam** adalah Progressive Web App (PWA) *voice journaling* berbasis AI yang dirancang untuk meminimalkan friksi mencatat harian. Cukup dengan bicarakan harimu secara alami, **Google Gemini 2.5 Flash Multimodal Engine** akan mentranskripsi ucapan dan merapikan ceritamu menjadi catatan jurnal yang terstruktur, rapi, dan mudah ditelusuri kembali tanpa menghilangkan fakta atau detail emosional.
+
+Antarmuka Gumam mengadopsi estetika **Neumorphism (Soft UI)** yang taktil dan menenangkan — menggabungkan bayangan ganda halus (*dual soft shadows*), tombol konsentris berundak, navigasi gestur *swipe*, dan sistem tema ganda (Light & Dark Mode) yang 100% menyatu.
 
 ---
 
 ## ✨ Fitur Utama (MVP & Stretch Features)
 
-### 🎙️ 1. Voice-First Studio Recording & Real-time Waveform
-- **One-tap Record**: 1 ketukan untuk mulai dan berhenti merekam.
-- **Real-time Waveform Visualizer**: Animasi gelombang suara real-time berbasis `AudioContext` + `AnalyserNode` browser native.
+### 🎙️ 1. Studio Rekam Suara Neumorphic & Waveform
+- **Concentric Beveled Dial**: Tombol rekam konsentris taktil yang timbul saat idle dan amblas cekung saat merekam.
+- **Real-time Waveform Visualizer**: Wadah audio cekung (*recessed bay*) dengan visualizer gelombang suara dinamis berbasis `AudioContext` + `AnalyserNode`.
+- **Haptic Tactile Feedback**: Getaran mikro haptik (`navigator.vibrate`) saat mulai merekam, berhenti, dan menavigasi tab.
 - **Alternatif Tulis Manual**: Mode ketik manual untuk situasi tidak nyaman berbicara di tempat umum.
 
 ### 🤖 2. Integrasi Multimodal Gemini AI Engine
-- **Audio-to-Text & Summarization**: Gemini 2.5 Flash menerima input audio Base64 secara langsung, menghasilkan transkrip mentah + rangkuman rapi sekaligus dalam 1 request JSON.
-- **Review & Edit Screen**: Textarea hasil rangkuman AI dapat dikoreksi manual oleh pengguna sebelum disimpan.
+- **Audio-to-Text & Summarization**: Gemini 2.5 Flash menerima input audio Base64 secara langsung, menghasilkan transkrip mentah + rangkuman rapi sekaligus dalam 1 request JSON terstruktur.
+- **Review & Edit Screen**: Textarea hasil rangkuman AI dapat dikoreksi manual oleh pengguna sebelum disimpan ke cloud.
 - **Auto Mood & Auto-Tagging**: AI mendeteksi mood dominan (*"Senang"*, *"Fokus"*, *"Lelah"*) dan mengusulkan 1-3 hashtag otomatis (`#Harian`, `#Belanja`).
+- **AI Ringkasan Mingguan**: Menghasilkan 1 paragraf evaluasi tren mood dan topik mingguan dari seluruh catatan pengguna.
 
 ### 🔍 3. AI Tanya Jurnal (Natural Language Memory Search)
 - **Semantic Q&A**: Pengguna dapat bertanya dengan bahasa alami (misal: *"Kapan terakhir beli galon dan berapa harganya?"*).
 - **Anti-Halusinasi**: Gemini AI membaca riwayat catatan jurnal dan menjawab jujur tanpa mengarang data.
 - **Pill Referensi Sumber**: Setiap jawaban menyertakan link catatan sumber yang dapat diklik langsung.
 
-### 🔥 4. Streak Counter & Grace Day Motivator
+### 📱 4. Gestur Taktil & Navigasi Mobile/Desktop
+- **Swipe Tab Navigation**: Geser layar ke kiri/kanan (*swipe gesture*) di HP untuk berpindah antar tab (Rekam ↔ Catatan ↔ Tanya ↔ Setelan) secara mulus.
+- **Floating Neumorphic Dock**: Navigasi bawah melayang di mobile dengan tab aktif yang amblas ke dalam.
+- **Desktop Multi-Column**: Fixed sidebar di desktop widescreen (≥ 768px) dengan split-view bento kalender & daftar catatan.
+
+### ⚡ 5. Lazy Loading & Performa Tinggi
+- **Code-Splitting Async Routes**: Setiap halaman dimuat secara lazy (`React.lazy` + `Suspense`) untuk mempercepat *Initial Load Time*.
+- **Neumorphic Skeleton Fallback**: Layar transisi berdenyut halus bergaya soft UI tanpa layar putih kosong.
+
+### 🌓 6. Sistem Tema 1-Klik (Light & Dark Mode)
+- **Light Mode Neumorphism (`#E4E8EE`)**: Tampilan segar bertekstur keramik halus dengan bayangan terang putih dan bayangan gelap abu.
+- **Dark Mode Neumorphism (`#1E232B`)**: Tampilan malam hari yang intim dengan pendaran aksen *bioluminescent cyan-teal* (`#76ABAE`).
+- **Toggle Instan**: Switch tema instan di Mobile Header, Desktop Sidebar, dan Halaman Setelan.
+
+### 🔥 7. Streak Motivator & Grace Day
 - **Logika Streak Interval**: Menghitung keteraturan harian berdasarkan preferensi target frekuensi pengguna.
 - **Grace Day**: 1x "izin bolong" per minggu tanpa mereset streak harian agar lebih sehat secara psikologis.
 
-### 🔒 5. Privasi & Isolasi Data Per Akun
+### 🔒 8. Privasi & Isolasi Data Per Akun
 - **Anonymous Authentication**: Login otomatis tanpa form untuk pengalaman tanpa friksi.
 - **Server-Side Security Rules**: Firebase Security Rules menegakkan isolasi data di level server (`request.auth.uid == resource.data.userId`).
-
-### 📱 6. Desain Responsive Native (Mobile PWA & Desktop Widescreen)
-- **Mobile View**: PWA *Notebook Tab* navigation bar di bagian bawah.
-- **Desktop Widescreen**: Multi-column studio layout dengan Sidebar persisten di kiri (`md:flex`), split-view kalender & daftar catatan, serta kartu prompt pemantik tulisan.
-
-### 🔔 7. Reminder Notifikasi & Offline-First
-- **Local PWA Notification**: Penjadwalan reminder pengingat lokal via Service Worker PWA (`Notification API`).
-- **Offline Persistence**: Firestore offline persistence menyimpan data di IndexedDB lokal agar dapat dibaca tanpa koneksi internet.
 - **Ekspor/Impor JSON**: Fitur unduh cadangan arsip jurnal format `.json`.
 
 ---
@@ -56,11 +67,11 @@
 
 | Layer | Teknologi | Alasan Pemilihan |
 |---|---|---|
-| **Framework & Build** | React 18 + Vite + TypeScript | Performa cepat, type safety, PWA plugin matang |
-| **Styling & Icons** | Tailwind CSS + Lucide Icons | Design system custom (`canvas`, `surface`, `accent`) |
+| **Framework & Build** | React 18 + Vite + TypeScript | Performa cepat, type safety, code-splitting `React.lazy` |
+| **Styling & UI System** | Tailwind CSS + Neumorphic Soft UI Tokens | Desain taktil kustom, dual shadows, dan responsivitas penuh |
 | **BaaS (Auth & DB)** | Firebase Auth (Anonymous) + Firestore + Storage | Isolasi data server rules & offline persistence |
-| **AI Multimodal** | Google Gemini API (`gemini-2.5-flash`) | Akurasi tinggi membaca audio Bahasa Indonesia |
-| **PWA Layer** | `vite-plugin-pwa` + Web Notification API | Installable, service worker, & local push prompt |
+| **AI Multimodal** | Google Gemini API (`gemini-2.5-flash`) | Multimodal audio-to-text & semantic search natural |
+| **PWA & Gestures** | `vite-plugin-pwa` + Web Notification + Touch API | Installable, service worker, & gesture swipe navigation |
 
 ---
 
@@ -115,21 +126,22 @@
 
 ```
 Gumam/
-├── public/                     # Icons & manifest assets
+├── public/                     # Icons, logo.svg, favicon.svg & manifest
 ├── src/
-│   ├── components/             # Reusable UI (Navbar, Header, DesktopSidebar, Calendar, Waveform)
-│   ├── features/               # Feature Modules
+│   ├── assets/                 # High-res logo assets (logo.png, etc.)
+│   ├── components/             # Reusable UI (Navbar, Header, DesktopSidebar, GumamLogo, ThemeToggle, Calendar, Waveform, PageSkeleton)
+│   ├── features/               # Feature Modules (Lazy Loaded)
 │   │   ├── entries/            # EntriesPage & EntryDetailPage
 │   │   ├── onboarding/         # OnboardingPage (3-step stepper)
-│   │   ├── recording/          # RecordPage (Mic Studio & Visualizer)
+│   │   ├── recording/          # RecordPage (Neumorphic Studio & Visualizer)
 │   │   ├── search/             # SearchAskPage (AI Tanya Jurnal)
 │   │   ├── settings/           # SettingsPage & Theme Switcher
 │   │   └── streak/             # StreakBadge Component
-│   ├── lib/                    # Core Utilities (ai.ts, firebase.ts, entries.ts, notifications.ts)
+│   ├── lib/                    # Core Utilities (ai.ts, firebase.ts, entries.ts, notifications.ts, useSwipe.ts, theme.ts)
 │   ├── types/                  # TypeScript Type Definitions
-│   ├── App.tsx                 # Main Responsive Layout & Router
+│   ├── App.tsx                 # Responsive Layout, Router, Suspense & Gesture Hook
 │   ├── main.tsx                # React Mount Point
-│   └── index.css               # Design System CSS Variables
+│   └── index.css               # Neumorphism CSS Variables & Dual Shadow Tokens
 ├── firestore.rules             # Server-side Firestore Security Rules
 ├── storage.rules               # Server-side Storage Security Rules
 ├── LOG-PERCAKAPAN.md           # Log Lengkap Alur Prompting & Implementasi

@@ -1,5 +1,6 @@
-import React from 'react';
+import { GumamLogo } from './GumamLogo';
 import { StreakBadge } from '../features/streak/StreakBadge';
+import { ThemeToggle } from './ThemeToggle';
 import { APP_NAME } from '../lib/constants';
 import { useStreak } from '../lib/useStreak';
 
@@ -11,14 +12,18 @@ export const Header: React.FC<HeaderProps> = ({ title = APP_NAME }) => {
   const { streak } = useStreak();
 
   return (
-    <header className="sticky top-0 z-30 bg-canvas/80 backdrop-blur-md border-b border-surface-alt/40 px-4 py-3">
+    <header className="sticky top-0 z-30 bg-canvas/90 backdrop-blur-md px-4 py-3 border-b border-black/[0.03] dark:border-white/[0.03]">
       <div className="max-w-md mx-auto flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="font-display font-bold text-xl text-ink tracking-tight">
+        <div className="flex items-center gap-2.5">
+          <GumamLogo size="sm" />
+          <span className="font-display font-bold text-lg text-ink tracking-tight">
             {title}
           </span>
         </div>
-        <StreakBadge streakCount={streak.currentStreak} />
+        <div className="flex items-center gap-2">
+          <StreakBadge streakCount={streak.currentStreak} />
+          <ThemeToggle size="sm" />
+        </div>
       </div>
     </header>
   );

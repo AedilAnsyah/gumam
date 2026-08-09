@@ -30,7 +30,7 @@ export const AudioWaveformVisualizer: React.FC<AudioWaveformVisualizerProps> = (
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
       audioCtx = new AudioContextClass();
       analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 64; // Fast Fourier Transform size for bars count
+      analyser.fftSize = 64;
 
       source = audioCtx.createMediaStreamSource(mediaStream);
       source.connect(analyser);
@@ -40,6 +40,10 @@ export const AudioWaveformVisualizer: React.FC<AudioWaveformVisualizerProps> = (
 
       const canvas = canvasRef.current;
       const canvasCtx = canvas.getContext('2d');
+
+      const accentColor = getComputedStyle(document.documentElement)
+        .getPropertyValue('--color-accent')
+        .trim() || '#3B828E';
 
       const draw = () => {
         if (!canvasCtx || !canvas) return;
@@ -53,19 +57,16 @@ export const AudioWaveformVisualizer: React.FC<AudioWaveformVisualizerProps> = (
         let x = 0;
 
         for (let i = 0; i < bufferLength; i++) {
-          // Normalize volume height
-          const barHeight = (dataArray[i] / 255) * canvas.height * 0.85;
+          const barHeight = Math.max((dataArray[i] / 255) * canvas.height * 0.85, 6);
 
-          // Teal accent color (#76ABAE)
-          canvasCtx.fillStyle = '#76ABAE';
+          canvasCtx.fillStyle = accentColor;
           
-          // Draw rounded vertical bars centered vertically
           const y = (canvas.height - barHeight) / 2;
           canvasCtx.beginPath();
           if (canvasCtx.roundRect) {
-            canvasCtx.roundRect(x, Math.max(y, 4), Math.max(barWidth - 2, 3), Math.max(barHeight, 4), 4);
+            canvasCtx.roundRect(x, y, Math.max(barWidth - 2, 3), barHeight, 4);
           } else {
-            canvasCtx.rect(x, Math.max(y, 4), Math.max(barWidth - 2, 3), Math.max(barHeight, 4));
+            canvasCtx.rect(x, y, Math.max(barWidth - 2, 3), barHeight);
           }
           canvasCtx.fill();
 

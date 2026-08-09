@@ -60,10 +60,11 @@ export const SearchAskPage: React.FC = () => {
         {/* Kolom Kiri: Input & Hasil Jawab AI */}
         <div className="md:col-span-7 space-y-6">
           {/* Header Banner */}
-          <div className="bg-surface border border-accent/30 rounded-3xl p-6 relative overflow-hidden shadow-lg text-left">
-            <div className="absolute -right-4 -bottom-4 w-28 h-28 bg-accent/10 rounded-full blur-2xl pointer-events-none" />
-            <div className="flex items-center gap-2 text-accent font-semibold text-sm mb-1.5">
-              <Sparkles className="w-4 h-4 text-accent animate-pulse" />
+          <div className="neu-card p-6 text-left space-y-2">
+            <div className="flex items-center gap-2 text-accent font-semibold text-sm mb-1">
+              <div className="w-7 h-7 rounded-full neu-inset-sm flex items-center justify-center text-accent">
+                <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+              </div>
               <span>{`Tanya ke ${APP_NAME} (AI Search)`}</span>
             </div>
             <p className="text-xs text-ink-muted leading-relaxed">
@@ -84,22 +85,24 @@ export const SearchAskPage: React.FC = () => {
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="Coba tanya: 'kapan terakhir beli galon?'"
-              className="w-full bg-surface border border-surface-alt rounded-2xl pl-5 pr-14 py-4 text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:border-accent shadow-md"
+              className="w-full neu-inset rounded-2xl pl-5 pr-16 py-4 text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:ring-1 focus:ring-accent/40 bg-transparent"
             />
             <button
               type="submit"
               disabled={!question.trim() || isAsking}
               aria-label="Kirim Pertanyaan AI"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-accent disabled:opacity-50 text-canvas flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-md shadow-accent/20"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl neu-button disabled:opacity-50 text-accent flex items-center justify-center cursor-pointer"
             >
-              {isAsking ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-4 h-4 fill-current" />}
+              {isAsking ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             </button>
           </form>
 
           {/* Loading Processing State */}
           {isAsking && (
-            <div className="bg-surface border border-accent/30 rounded-3xl p-8 text-center space-y-4 shadow-xl animate-fadeIn">
-              <Loader2 className="w-10 h-10 text-accent animate-spin mx-auto" />
+            <div className="neu-groove p-8 text-center space-y-4">
+              <div className="w-12 h-12 rounded-full neu-raised flex items-center justify-center text-accent mx-auto">
+                <Loader2 className="w-6 h-6 animate-spin" />
+              </div>
               <WaveformDecoration bars={14} active={true} className="h-6" />
               <div className="text-xs font-mono text-ink">Membaca & menganalisis riwayat catatan jurnalmu...</div>
             </div>
@@ -107,7 +110,7 @@ export const SearchAskPage: React.FC = () => {
 
           {/* Error Banner */}
           {errorMessage && (
-            <div className="bg-danger/15 border border-danger/30 text-danger p-4 rounded-2xl text-xs flex items-center gap-2 text-left shadow-md">
+            <div className="neu-inset-sm text-danger p-4 rounded-2xl text-xs flex items-center gap-2 text-left">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMessage}</span>
             </div>
@@ -115,19 +118,21 @@ export const SearchAskPage: React.FC = () => {
 
           {/* AI Answer Result Card */}
           {aiAnswer && (
-            <div className="bg-surface border border-accent/40 rounded-3xl p-6 space-y-4 shadow-xl animate-fadeIn text-left">
-              <div className="flex items-center gap-2 text-accent font-semibold text-xs border-b border-surface-alt/60 pb-3">
-                <Sparkles className="w-4 h-4" />
+            <div className="neu-card p-6 md:p-8 space-y-4 text-left animate-fadeIn">
+              <div className="flex items-center gap-2 text-accent font-semibold text-xs border-b border-black/[0.04] dark:border-white/[0.04] pb-3">
+                <div className="w-6 h-6 rounded-full neu-inset-sm flex items-center justify-center text-accent">
+                  <Sparkles className="w-3.5 h-3.5" />
+                </div>
                 <span>{`Jawaban AI ${APP_NAME}`}</span>
               </div>
 
-              <p className="text-sm text-ink leading-relaxed font-sans font-normal">
+              <p className="text-sm text-ink leading-relaxed font-sans neu-inset-sm p-4 rounded-2xl">
                 {aiAnswer.answer}
               </p>
 
               {/* Source Reference Links */}
               {aiAnswer.referencedEntryIds && aiAnswer.referencedEntryIds.length > 0 && (
-                <div className="border-t border-surface-alt/60 pt-3 space-y-2">
+                <div className="border-t border-black/[0.04] dark:border-white/[0.04] pt-4 space-y-2">
                   <span className="text-[11px] font-mono text-ink-muted uppercase tracking-wider">
                     Catatan Sumber Relevan:
                   </span>
@@ -138,7 +143,7 @@ export const SearchAskPage: React.FC = () => {
                         <Link
                           key={refId}
                           to={`/entries/${refId}`}
-                          className="inline-flex items-center gap-1.5 bg-accent-soft/70 hover:bg-accent/20 border border-accent/30 text-accent px-3.5 py-2 rounded-xl text-xs font-mono transition-all hover:scale-105"
+                          className="neu-pill px-4 py-2 text-xs font-mono text-accent flex items-center gap-1.5 hover:neu-inset-sm transition-all"
                         >
                           <BookOpen className="w-3.5 h-3.5" />
                           <span>
@@ -152,7 +157,7 @@ export const SearchAskPage: React.FC = () => {
               )}
 
               {!aiAnswer.found && (
-                <div className="text-[11px] font-mono text-ink-muted italic border-t border-surface-alt/60 pt-2">
+                <div className="text-[11px] font-mono text-ink-muted italic border-t border-black/[0.04] dark:border-white/[0.04] pt-3">
                   💡 Jawaban ini dihasilkan secara jujur tanpa mengarang data dari luar jurnalmu.
                 </div>
               )}
@@ -161,10 +166,12 @@ export const SearchAskPage: React.FC = () => {
         </div>
 
         {/* Kolom Kanan: Suggestion Chips & Tips (Tampil khusus di Desktop) */}
-        <div className="md:col-span-5 space-y-5 text-left">
-          <div className="bg-surface border border-surface-alt rounded-3xl p-6 space-y-4 shadow-lg">
+        <div className="md:col-span-5 space-y-6 text-left">
+          <div className="neu-card p-6 space-y-4">
             <div className="flex items-center gap-2 text-accent font-semibold text-sm">
-              <HelpCircle className="w-4 h-4" />
+              <div className="w-7 h-7 rounded-full neu-inset-sm flex items-center justify-center text-accent">
+                <HelpCircle className="w-3.5 h-3.5" />
+              </div>
               <span>Contoh Pertanyaan</span>
             </div>
             <p className="text-xs text-ink-muted leading-relaxed">
@@ -178,7 +185,7 @@ export const SearchAskPage: React.FC = () => {
                     setQuestion(item);
                     handleAsk(item);
                   }}
-                  className="text-left text-xs bg-canvas/80 hover:bg-canvas border border-surface-alt/80 hover:border-accent/40 rounded-xl px-4 py-3 text-ink-muted hover:text-ink transition-colors flex items-center justify-between group shadow-sm"
+                  className="text-left text-xs neu-inset-sm hover:neu-inset rounded-2xl px-4 py-3 text-ink transition-all flex items-center justify-between group cursor-pointer"
                 >
                   <span>{item}</span>
                   <ArrowRight className="w-3.5 h-3.5 text-accent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -187,7 +194,7 @@ export const SearchAskPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-surface/50 border border-surface-alt rounded-3xl p-6 space-y-2 text-xs text-ink-muted">
+          <div className="neu-card p-6 space-y-2 text-xs text-ink-muted">
             <div className="font-semibold text-ink">Privasi & Anti-Halusinasi</div>
             <p className="leading-relaxed">
               Pencarian dilakukan secara privat. Gemini AI diprogram secara khusus untuk menolak mengarang informasi apabila catatan yang dicari tidak ditemukan.

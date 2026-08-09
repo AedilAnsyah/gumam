@@ -138,8 +138,10 @@ export const EntryDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-ink-muted space-y-2">
-        <Loader2 className="w-8 h-8 text-accent animate-spin" />
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-ink-muted space-y-3">
+        <div className="w-12 h-12 rounded-full neu-inset flex items-center justify-center text-accent">
+          <Loader2 className="w-6 h-6 animate-spin" />
+        </div>
         <span className="text-xs font-mono">Memuat detail catatan...</span>
       </div>
     );
@@ -147,11 +149,11 @@ export const EntryDetailPage: React.FC = () => {
 
   if (!entry) {
     return (
-      <div className="p-6 text-center space-y-4">
+      <div className="neu-card p-8 text-center space-y-4 max-w-md mx-auto my-12">
         <p className="text-sm text-ink-muted">Catatan tidak ditemukan.</p>
         <button
           onClick={() => navigate(ROUTES.ENTRIES)}
-          className="text-xs font-semibold text-accent underline"
+          className="neu-button px-5 py-2.5 rounded-2xl text-xs font-semibold text-accent"
         >
           Kembali ke Daftar Catatan
         </button>
@@ -160,7 +162,7 @@ export const EntryDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 pb-20 px-4 pt-2">
+    <div className="space-y-6 pb-20 md:pb-8">
       {/* Hidden Audio Player */}
       {audioUrl && (
         <audio
@@ -175,7 +177,7 @@ export const EntryDetailPage: React.FC = () => {
       <div className="flex items-center justify-between">
         <button
           onClick={() => navigate(ROUTES.ENTRIES)}
-          className="flex items-center gap-1 text-sm text-ink-muted hover:text-ink transition-colors font-mono"
+          className="neu-button flex items-center gap-1.5 px-4 py-2 rounded-2xl text-xs text-ink-muted hover:text-ink font-mono cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Kembali</span>
@@ -183,14 +185,14 @@ export const EntryDetailPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsEditing(!isEditing)}
-            className="p-2 text-ink-muted hover:text-accent rounded-lg transition-colors"
+            className="w-10 h-10 neu-button text-ink-muted hover:text-accent rounded-2xl flex items-center justify-center cursor-pointer transition-all"
             title="Edit Catatan"
           >
             <Edit2 className="w-4 h-4" />
           </button>
           <button
             onClick={handleDelete}
-            className="p-2 text-ink-muted hover:text-danger rounded-lg transition-colors"
+            className="w-10 h-10 neu-button text-ink-muted hover:text-danger rounded-2xl flex items-center justify-center cursor-pointer transition-all"
             title="Hapus Catatan"
           >
             <Trash2 className="w-4 h-4" />
@@ -199,95 +201,97 @@ export const EntryDetailPage: React.FC = () => {
       </div>
 
       {/* Main Detail Card */}
-      <div className="bg-surface border border-surface-alt rounded-2xl p-5 space-y-4 shadow-lg">
+      <div className="neu-card p-6 md:p-8 space-y-5 text-left">
         {/* Timestamp */}
-        <div className="flex items-center justify-between text-xs font-mono text-ink-muted border-b border-surface-alt/60 pb-3">
-          <span>Catatan Jurnal</span>
+        <div className="flex items-center justify-between text-xs font-mono text-ink-muted border-b border-black/[0.04] dark:border-white/[0.04] pb-4">
+          <span className="neu-pill px-3 py-1 text-accent font-semibold">Catatan Jurnal</span>
           <span>{new Date(entry.createdAt).toLocaleString('id-ID')}</span>
         </div>
 
         {/* Audio Player if available */}
         {entry.hasAudio && audioUrl && (
-          <div className="bg-canvas border border-accent/20 rounded-xl p-3 flex items-center gap-3">
+          <div className="neu-inset rounded-2xl p-4 flex items-center gap-4">
             <button
               onClick={togglePlay}
-              className="w-10 h-10 rounded-full bg-accent text-canvas flex items-center justify-center shrink-0 hover:scale-105 transition-all shadow-md shadow-accent/20"
+              className="w-12 h-12 rounded-full neu-raised hover:neu-inset active:neu-inset text-accent flex items-center justify-center shrink-0 transition-all cursor-pointer"
             >
               {isPlaying ? (
-                <Pause className="w-4 h-4 fill-current" />
+                <Pause className="w-5 h-5 fill-current" />
               ) : (
-                <Play className="w-4 h-4 fill-current ml-0.5" />
+                <Play className="w-5 h-5 fill-current ml-0.5" />
               )}
             </button>
             <div className="flex-1">
-              <div className="flex items-center justify-between text-xs font-mono text-ink mb-1">
-                <span className="flex items-center gap-1 text-accent font-semibold">
-                  <Volume2 className="w-3.5 h-3.5" /> Rekaman Suara Asli
+              <div className="flex items-center justify-between text-xs font-mono text-ink mb-1.5">
+                <span className="flex items-center gap-1.5 text-accent font-semibold">
+                  <Volume2 className="w-4 h-4" /> Rekaman Suara Asli
                 </span>
               </div>
-              <div className="w-full bg-surface-alt h-1.5 rounded-full overflow-hidden">
-                <div className={`bg-accent h-full ${isPlaying ? 'w-full transition-all duration-1000' : 'w-1/3'}`} />
+              <div className="w-full neu-inset-sm h-2 rounded-full overflow-hidden bg-surface-alt">
+                <div className={`bg-accent h-full rounded-full ${isPlaying ? 'w-full transition-all duration-1000' : 'w-1/3'}`} />
               </div>
             </div>
           </div>
         )}
 
         {/* Content Section (View or Edit Mode) */}
-        <div className="space-y-2">
+        <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-mono font-semibold uppercase text-accent tracking-wider">
+            <h3 className="text-xs font-mono font-bold uppercase text-accent tracking-wider">
               {entry.source === 'voice' ? 'Rangkuman AI' : 'Catatan Tulisan Manual'}
             </h3>
             {isEditing && (
-              <span className="text-[10px] font-mono text-warning">Mode Edit</span>
+              <span className="neu-pill px-3 py-0.5 text-[10px] font-mono text-warning font-semibold">
+                Mode Edit
+              </span>
             )}
           </div>
 
           {isEditing ? (
-            <div className="space-y-3">
+            <div className="space-y-4">
               <textarea
                 value={editedContent}
                 onChange={(e) => setEditedContent(e.target.value)}
                 rows={6}
-                className="w-full bg-canvas border border-accent/40 rounded-xl p-3 text-sm text-ink leading-relaxed focus:outline-none focus:border-accent"
+                className="w-full neu-inset rounded-2xl p-4 text-sm text-ink leading-relaxed focus:outline-none focus:ring-1 focus:ring-accent/40 bg-transparent resize-none"
               />
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-2.5">
                 <button
                   onClick={() => setIsEditing(false)}
-                  className="px-3 py-1.5 text-xs text-ink-muted hover:text-ink transition-colors"
+                  className="neu-button px-4 py-2 rounded-xl text-xs text-ink-muted hover:text-ink cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   disabled={isSaving}
                   onClick={handleSaveEdit}
-                  className="bg-accent text-canvas px-4 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 hover:scale-105 transition-all shadow-md"
+                  className="neu-button text-accent px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                 >
-                  {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+                  {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5 text-accent" />}
                   <span>Simpan Perubahan</span>
                 </button>
               </div>
             </div>
           ) : (
-            <p className="text-sm text-ink leading-relaxed font-sans whitespace-pre-wrap">
+            <p className="text-sm text-ink leading-relaxed font-sans whitespace-pre-wrap neu-inset-sm p-5 rounded-2xl">
               {entry.content}
             </p>
           )}
         </div>
 
         {/* Mood & Tags */}
-        <div className="flex items-center justify-between text-xs border-t border-surface-alt/60 pt-3">
+        <div className="flex items-center justify-between text-xs border-t border-black/[0.04] dark:border-white/[0.04] pt-4">
           {entry.mood && (
-            <div className="flex items-center gap-1.5 text-ink-muted">
-              <Smile className="w-3.5 h-3.5 text-accent" />
-              <span>Mood: <strong className="text-ink">{entry.mood}</strong></span>
+            <div className="flex items-center gap-2 text-ink-muted">
+              <Smile className="w-4 h-4 text-accent" />
+              <span>Mood: <strong className="text-ink font-semibold">{entry.mood}</strong></span>
             </div>
           )}
           {entry.tags && entry.tags.length > 0 && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5 flex-wrap">
               <Tag className="w-3.5 h-3.5 text-accent" />
               {entry.tags.map((t, idx) => (
-                <span key={idx} className="bg-accent-soft text-accent px-2 py-0.5 rounded-md font-mono text-[10px]">
+                <span key={idx} className="neu-pill px-3 py-0.5 text-accent font-mono text-[10px] font-semibold">
                   #{t}
                 </span>
               ))}
@@ -297,16 +301,16 @@ export const EntryDetailPage: React.FC = () => {
 
         {/* Collapsible Transcript Raw */}
         {entry.transcriptRaw && (
-          <div className="border-t border-surface-alt/60 pt-3">
+          <div className="border-t border-black/[0.04] dark:border-white/[0.04] pt-4">
             <button
               onClick={() => setShowTranscript(!showTranscript)}
-              className="flex items-center justify-between w-full text-xs font-mono text-ink-muted hover:text-ink transition-colors"
+              className="flex items-center justify-between w-full text-xs font-mono text-ink-muted hover:text-ink transition-colors cursor-pointer"
             >
               <span>Transkrip Suara Mentah</span>
               {showTranscript ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </button>
             {showTranscript && (
-              <p className="mt-2 text-xs font-mono text-ink-muted bg-canvas p-3 rounded-xl leading-relaxed italic">
+              <p className="mt-2 text-xs font-mono text-ink-muted neu-inset p-4 rounded-2xl leading-relaxed italic">
                 "{entry.transcriptRaw}"
               </p>
             )}

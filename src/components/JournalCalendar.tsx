@@ -40,21 +40,21 @@ export const JournalCalendar: React.FC<JournalCalendarProps> = ({
   };
 
   return (
-    <div className="bg-surface border border-surface-alt rounded-2xl p-4 space-y-3 shadow-md">
+    <div className="neu-card p-5 space-y-4 text-left">
       {/* Month Navigation */}
       <div className="flex items-center justify-between text-sm font-semibold text-ink px-1">
         <button
           onClick={prevMonth}
-          className="p-1 rounded-lg hover:bg-surface-alt text-ink-muted hover:text-ink transition-colors"
+          className="w-8 h-8 rounded-full neu-button flex items-center justify-center text-ink-muted hover:text-ink cursor-pointer"
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
-        <span className="font-display">
+        <span className="font-display font-bold text-base">
           {monthNames[month]} {year}
         </span>
         <button
           onClick={nextMonth}
-          className="p-1 rounded-lg hover:bg-surface-alt text-ink-muted hover:text-ink transition-colors"
+          className="w-8 h-8 rounded-full neu-button flex items-center justify-center text-ink-muted hover:text-ink cursor-pointer"
         >
           <ChevronRight className="w-4 h-4" />
         </button>
@@ -72,10 +72,10 @@ export const JournalCalendar: React.FC<JournalCalendarProps> = ({
       </div>
 
       {/* Days Grid */}
-      <div className="grid grid-cols-7 gap-1 text-center text-xs font-mono">
+      <div className="grid grid-cols-7 gap-1.5 text-center text-xs font-mono">
         {/* Empty slots before first day */}
         {Array.from({ length: firstDayIndex }).map((_, i) => (
-          <div key={`empty-${i}`} className="h-8" />
+          <div key={`empty-${i}`} className="h-9" />
         ))}
 
         {/* Month Days */}
@@ -92,17 +92,17 @@ export const JournalCalendar: React.FC<JournalCalendarProps> = ({
             <button
               key={dateStr}
               onClick={() => onSelectDate(isSelected ? null : dateStr)}
-              className={`h-8 rounded-xl flex flex-col items-center justify-center relative transition-all ${
+              className={`h-9 rounded-2xl flex flex-col items-center justify-center relative transition-all cursor-pointer ${
                 isSelected
-                  ? 'bg-accent text-canvas font-bold shadow-md scale-105'
+                  ? 'neu-inset text-accent font-bold scale-[0.96]'
                   : hasEntry
-                  ? 'bg-surface-alt text-accent font-semibold hover:bg-accent/20'
-                  : 'text-ink-muted hover:bg-surface-alt/50 hover:text-ink'
+                  ? 'neu-raised-sm text-accent font-semibold hover:scale-105'
+                  : 'text-ink-muted hover:neu-raised-sm hover:text-ink'
               }`}
             >
               <span>{dayNum}</span>
               {hasEntry && !isSelected && (
-                <span className="w-1.5 h-1.5 rounded-full bg-accent absolute bottom-1 shadow-sm" />
+                <span className="w-1.5 h-1.5 rounded-full bg-accent absolute bottom-1" />
               )}
             </button>
           );
@@ -110,13 +110,13 @@ export const JournalCalendar: React.FC<JournalCalendarProps> = ({
       </div>
 
       {selectedDate && (
-        <div className="flex items-center justify-between text-xs pt-2 border-t border-surface-alt/60">
+        <div className="flex items-center justify-between text-xs pt-3 border-t border-black/[0.04] dark:border-white/[0.04]">
           <span className="text-ink-muted">
             Filter: <strong className="text-accent">{selectedDate}</strong>
           </span>
           <button
             onClick={() => onSelectDate(null)}
-            className="text-accent hover:underline font-mono text-[11px]"
+            className="neu-pill px-3 py-1 text-accent font-mono text-[10px] hover:neu-inset-sm transition-all cursor-pointer"
           >
             Tampilkan Semua
           </button>

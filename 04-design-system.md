@@ -1,144 +1,134 @@
-# 04 — Design System
+# 04 — Design System: Neumorphism (Soft UI)
 
-> Palet warna sudah ditentukan tim (lihat swatch yang di-upload): navy gelap, slate gelap, teal lembut, dan abu terang. Bagian di bawah sudah diisi dengan hex final hasil sampling langsung dari gambar, plus turunan warna tambahan yang dibutuhkan (muted text, accent-soft, status colors) supaya konsisten satu sistem. Semua bagian lain (tipografi, layout, motion, signature element) tetap seperti rancangan awal karena memang tidak bergantung warna spesifik.
+> Sistem desain **Gumam** mengadopsi gaya **Neumorphism (Soft UI)** yang taktil, bersih, dan menenangkan. Desain ini memanfaatkan bayangan ganda halus (*dual soft shadows*) untuk menciptakan ilusi komponen fisik yang timbul (*raised/embossed*) atau amblas ke dalam (*sunken/inset*), dipadukan dengan aksen gelombang suara (*waveform*) dan navigasi gestur *swipe*.
 
-## Prinsip desain untuk project ini
+---
 
-Tiga look yang paling sering muncul di hasil AI-generated design dan **wajib dihindari** supaya tidak terkesan "AI slop":
-1. Background krem hangat (`#F4F1EA`-ish) + font serif kontras tinggi + aksen terracotta/clay oranye kemerahan (`#D97757`-ish).
-2. Background hitam pekat + satu aksen hijau neon/vermilion tunggal.
-3. Layout ala koran/broadsheet: garis tipis (hairline), sudut kotak tegas (border-radius 0), kolom padat.
+## 🏛️ Prinsip Desain Utama
 
-Ketiganya boleh dipakai **hanya kalau** memang sengaja jadi pilihan sadar tim (misal tema jurnal memang ingin terasa seperti buku catatan lama bergaya koran) — tapi untuk project journaling personal yang intim & tenang, arah yang lebih pas justru **menjauh** dari ketiganya.
+1. **Monochromatic Surface Blending:**
+   * Warna latar belakang (*canvas*) dan warna kartu/komponen (*surface*) dibuat **persis sama** (`#E4E8EE` pada Light Mode dan `#1E232B` pada Dark Mode).
+   * Kedalaman 3D tidak dibentuk oleh garis tepi hitam keras (*harsh borders*), melainkan oleh perpaduan bayangan terang (*light highlight*) di sudut kiri-atas dan bayangan gelap (*soft drop-shadow*) di sudut kanan-bawah.
+2. **Spend Boldness in One Place:**
+   * Aksen warna dan animasi paling ekspresif dicurahkan ke **Hero Moment**: Tombol Rekam Konsentris Taktil dan *Live Audio Waveform Visualizer*. Sisa layar tetap tenang tanpa kebisingan visual.
+3. **Tactile Interaction & Haptic Feedback:**
+   * Tombol beralih dari kondisi timbul (*raised*) menjadi amblas (*inset*) saat ditekan, disertai getaran mikro haptik (`navigator.vibrate`) di perangkat bergerak.
+4. **Adaptive Gesture First:**
+   * Mendukung gestur usap (*swipe left/right*) antar-tab utama dengan deteksi sudut cerdas tanpa menghambat scroll vertikal.
 
-**Palet yang dipilih tim** (navy `#222831` → slate `#31363F` → teal `#76ABAE` → abu terang `#EEEEEE`) secara aman berada di luar ketiga default di atas: bukan krem+terracotta, dan meski basis-nya gelap, ini bukan hitam pekat dengan aksen neon — navy-nya punya undertone biru-abu yang tenang, dan teal-nya desaturated/lembut, bukan hijau/vermilion neon yang menyala. Kombinasi ini justru punya karakter yang pas untuk journaling: **gelap dan hening seperti menulis di malam hari, dengan satu warna teal yang tenang seperti riak air** — selaras dengan signature element waveform (gelombang suara terasa natural dipasangkan dengan warna yang mengingatkan pada air/riak, bukan kebetulan).
+---
 
-**Signature element** yang diusulkan untuk app ini: visual **gelombang suara (waveform)** sebagai elemen berulang yang bermakna — dipakai saat merekam (real-time), sebagai dekorasi halus di halaman kosong/onboarding, dan sebagai bentuk dari streak indicator (bukan ikon api generic, tapi waveform yang "hidup" sesuai jumlah streak, diwarnai teal `#76ABAE`). Ini konkret karena app-nya memang tentang suara, bukan dekorasi yang ditempel begitu saja.
+## A. Token Warna & Sistem Bayangan
 
-## A. Color Token
+### 1. Token Warna (CSS Variables)
 
 ```css
 :root {
-  /* Warna dasar / permukaan — navy gelap sebagai canvas utama */
-  --color-canvas: #222831;        /* background utama app */
-  --color-surface: #31363F;       /* kartu catatan, modal, bottom sheet */
-  --color-surface-alt: #3B424D;   /* kartu catatan versi hover/aktif (surface diterangkan ~10%) */
+  /* Light Mode Neumorphism Palette (Default) */
+  --color-canvas: #E4E8EE;        /* Background utama app */
+  --color-surface: #E4E8EE;       /* Permukaan kartu, dock, & tombol */
+  --color-surface-alt: #D8DFE8;   /* Warna elemen sekunder */
 
-  /* Warna teks */
-  --color-ink: #EEEEEE;           /* teks utama, kontras 12.8:1 di atas canvas — jauh di atas AA */
-  --color-ink-muted: #A2A4A8;     /* teks sekunder / metadata (tanggal, label kecil) — campuran ink & surface */
+  /* Typography Colors */
+  --color-ink: #2B3240;           /* Teks utama (Kontras AAA 10.5:1) */
+  --color-ink-muted: #738096;     /* Teks sekunder, label, timestamp */
 
-  /* Warna aksen — satu aksen utama, teal dari palet */
-  --color-accent: #76ABAE;        /* tombol rekam, CTA utama, streak aktif, waveform */
-  --color-accent-soft: #3A4B52;   /* versi gelap-teal untuk background chip/tag terpilih, highlight search di atas surface gelap */
+  /* Accent Colors */
+  --color-accent: #3B828E;        /* Tombol rekam, CTA utama, waveform, streak */
+  --color-accent-soft: #D1DEE2;   /* Background chip/tag terpilih */
 
-  /* Warna status — diselaraskan ke saturasi rendah supaya senada dengan palet, bukan warna default browser */
-  --color-success: #8FBF9F;       /* konfirmasi tersimpan, streak bertambah */
-  --color-warning: #E3B23C;       /* peringatan ringan (mis. kuota storage) */
-  --color-danger: #D9736C;        /* hapus catatan, error */
+  /* Status Colors */
+  --color-success: #4E9A68;       /* Konfirmasi tersimpan, streak bertambah */
+  --color-warning: #D99B26;       /* Peringatan & Grace Day streak */
+  --color-danger: #D65A5A;        /* Tombol stop rekam, hapus catatan */
+
+  /* Neumorphic Dual Shadows (Light Mode) */
+  --neu-shadow-raised: 8px 8px 18px #c2c9d6, -8px -8px 18px #ffffff;
+  --neu-shadow-raised-sm: 4px 4px 10px #c2c9d6, -4px -4px 10px #ffffff;
+  --neu-shadow-raised-lg: 14px 14px 28px #bac2ce, -14px -14px 28px #ffffff;
+  --neu-shadow-inset: inset 4px 4px 8px #c2c9d6, inset -4px -4px 8px #ffffff;
+  --neu-shadow-inset-sm: inset 2px 2px 5px #c2c9d6, inset -2px -2px 5px #ffffff;
+}
+
+[data-theme="dark"],
+.dark {
+  /* Dark Mode Neumorphism Palette (Nocturne) */
+  --color-canvas: #1E232B;        /* Obsidian slate navy */
+  --color-surface: #1E232B;       /* Permukaan kartu gelap menyatu */
+  --color-surface-alt: #272D37;
+
+  /* Typography Colors */
+  --color-ink: #E2E8F0;           /* Teks putih abu nyaman di mata */
+  --color-ink-muted: #8E9BAE;     /* Teks metadata malam */
+
+  /* Accent Colors */
+  --color-accent: #76ABAE;        /* Bioluminescent cyan-teal glow */
+  --color-accent-soft: #2C3A40;
+
+  /* Status Colors */
+  --color-success: #8FBF9F;
+  --color-warning: #E3B23C;
+  --color-danger: #D9736C;
+
+  /* Neumorphic Dual Shadows (Dark Mode) */
+  --neu-shadow-raised: 8px 8px 18px #13161c, -8px -8px 18px #29303a;
+  --neu-shadow-raised-sm: 4px 4px 10px #13161c, -4px -4px 10px #29303a;
+  --neu-shadow-raised-lg: 14px 14px 28px #0f1217, -14px -14px 28px #2d3440;
+  --neu-shadow-inset: inset 4px 4px 8px #13161c, inset -4px -4px 8px #29303a;
+  --neu-shadow-inset-sm: inset 2px 2px 5px #13161c, inset -2px -2px 5px #29303a;
 }
 ```
 
-**Varian Light Mode (stretch, opsional)** — derivasi dari palet yang sama, bukan palet baru:
-```css
-[data-theme="light"] {
-  --color-canvas: #EEEEEE;
-  --color-surface: #FFFFFF;
-  --color-surface-alt: #E4E4E4;
-  --color-ink: #222831;
-  --color-ink-muted: #5C6470;
-  --color-accent: #4C8285;        /* teal digelapkan sedikit supaya tetap kontras AA di atas background terang */
-  --color-accent-soft: #DCEAEA;
-}
-```
+---
 
-**Catatan pemilihan warna:**
-- Kontras `--color-ink` (`#EEEEEE`) terhadap `--color-canvas` (`#222831`) terukur **~12.8:1** — jauh melewati syarat WCAG AA (4.5:1), bahkan lolos AAA.
-- `--color-accent` (`#76ABAE`) terhadap `--color-canvas` terukur **~5.8:1** — aman dipakai untuk teks besar/ikon/tombol, tapi tetap hindari dipakai untuk body text panjang (pakai `--color-ink` untuk itu).
-- `--color-accent` dipakai sangat hemat — hanya untuk 1–2 elemen paling penting per layar (tombol rekam, indikator streak aktif, waveform), bukan disebar ke semua tombol/link.
-- Untuk light mode, `--color-accent` sengaja digelapkan (`#4C8285` bukan `#76ABAE` mentah) karena teal asli terlalu terang untuk kontras AA di atas background putih/terang — turunan warna, bukan warna baru, tapi tetap perlu disesuaikan per konteks kontras.
+## B. Tipografi
 
-## B. Typography
-
-Pilih 2 typeface, bukan default sistem/Inter-untuk-segalanya:
-
-| Role | Kebutuhan | Contoh pilihan gratis (Google Fonts) yang tidak generic |
+| Role | Typeface | Penggunaan di Antarmuka |
 |---|---|---|
-| **Display** (judul, headline, angka streak besar) | Karakter kuat tapi tetap tenang & personal, cocok dibaca di atas background gelap — hindari serif tebal kontras tinggi ala template no.1 di atas | `Literata` (serif hangat yang memang dirancang untuk membaca panjang, terasa seperti "buku catatan", dan tetap nyaman di dark background), `Fraunces`, `Newsreader`, atau arah sans berkarakter: `Bricolage Grotesque` |
-| **Body** (isi catatan, UI copy) | Nyaman dibaca panjang di atas navy gelap, netral tapi tidak steril | `Public Sans`, `Karla`, `Sofia Sans` — hindari `Inter` polos supaya tidak terasa default template |
-| **Utility/mono** (timestamp, durasi rekaman, angka streak kecil) | Mono untuk data numerik supaya terasa presisi, warnai dengan `--color-ink-muted` atau `--color-accent` tergantung konteks | `JetBrains Mono`, `IBM Plex Mono` |
+| **Display / Heading** | `Literata` *(Warm Editorial Serif)* | Judul halaman, headline onboarding, angka streak besar. Terasa personal dan hangat seperti buku catatan fisik. |
+| **Body Text** | `Public Sans` | Teks hasil rangkuman AI, transkrip, deskripsi setelan. Sangat tajam dan nyaman dibaca panjang di mobile & desktop. |
+| **Utility / Mono** | `JetBrains Mono` | Timer rekaman audio (`00:42`), timestamp tanggal/jam, hashtag tagar, dan badge metadata. |
 
-Tetapkan skala tipografi (contoh, sesuaikan):
+Skala Tipografi:
 ```
---text-display-xl: 2.75rem / 1.1   (angka streak besar, headline onboarding)
---text-display-lg: 2rem / 1.15     (judul halaman)
---text-body: 1rem / 1.6            (isi catatan)
---text-caption: 0.8125rem / 1.4    (metadata, timestamp)
-```
-
-## C. Layout Concept
-
-Karena ini PWA yang dipakai sehari-hari (bukan landing page sekali lihat), prioritaskan **kejelasan & kecepatan akses**, bukan showcase visual berlebihan.
-
-Konsep layout yang diusulkan — **"Notebook Tab"**: navigasi utama berbentuk seperti tab pembatas buku catatan fisik (bukan bottom nav generic ala Material Design biasa), diletakkan menempel di satu sisi layar. Tiga tab: **Rekam** (default/home), **Catatan** (list/kalender), **Tanya** (AI search).
-
-ASCII wireframe halaman utama (Rekam):
-
-```
-┌─────────────────────────────┐
-│  🌊 streak: 12  [waveform]   │  <- streak indicator warna teal (--color-accent), bentuk waveform bukan ikon api
-│                               │
-│                               │
-│         ╭───────────╮        │
-│         │           │        │
-│         │    ◉      │        │  <- tombol rekam besar, pusat layar
-│         │           │        │
-│         ╰───────────╯        │
-│                               │
-│      "ketuk untuk mulai"     │
-│                               │
-│   [tulis manual sebagai      │
-│    gantinya →]                │
-├───┬───────────┬─────────────┤
-│Rek│  Catatan   │    Tanya    │  <- tab navigasi bawah/samping
-└───┴───────────┴─────────────┘
+--text-display-xl: 2.25rem / 1.2   (Headline Onboarding & Hero)
+--text-display-lg: 1.75rem / 1.25  (Judul Halaman)
+--text-heading-md: 1.25rem / 1.35  (Sub-judul & Modal Title)
+--text-body-base: 0.9375rem / 1.65 (Isi Catatan & AI Rangkuman)
+--text-body-sm: 0.8125rem / 1.5    (Keterangan & Metadata)
+--text-mono-sm: 0.75rem / 1.4      (Timer, Tags, Pill Badges)
 ```
 
-ASCII wireframe tampilan Catatan (list vs kalender, toggle di atas):
+---
 
-```
-┌─────────────────────────────┐
-│  Catatan     [List | 📅]     │
-│  🔍 cari isi catatan...      │
-├─────────────────────────────┤
-│  Hari ini, 14:20             │
-│  "Tadi beli galon di warung  │
-│   sebelah, harganya 20rb..." │
-│  🎧 audio tersimpan          │
-├─────────────────────────────┤
-│  Kemarin, 09:10               │
-│  "Rapat pagi berjalan..."    │
-│  #kerja  🙂                  │
-└─────────────────────────────┘
-```
+## C. Konsep Tata Letak & Komponen Kunci
 
-## D. Motion
+### 1. Tombol Rekam Konsentris (*Concentric Beveled Dial*)
+Tombol rekam besar di halaman utama dirancang dengan 3 cincin berundak ganda:
+* **Ring Luar:** Timbul (`.neu-raised`) sebagai bingkai dial.
+* **Ring Tengah:** Cekung (`.neu-inset-sm`) memberikan ilusi kedalaman mekanik.
+* **Inti Tombol:** Timbul saat idle (`hover:neu-inset`), dan amblas cekung (`.neu-inset text-danger animate-pulse`) saat rekaman berlangsung.
 
-Sesuai prinsip "spend boldness in one place": animasi paling berkarakter dicurahkan ke **momen merekam** (waveform real-time yang responsif terhadap volume suara — ini "hero moment" app), sisanya dibuat halus & minimal:
+### 2. Navigasi Melayang (*Floating Neumorphic Dock*)
+Di mobile (< 768px), navigasi berupa dock melayang di bagian bawah layar:
+* Tab inaktif memiliki bayangan timbul lembut.
+* Tab aktif beralih menjadi cekung (`.neu-inset`) beraksen warna teal dan ikon membesar secara proporsional.
 
-- **Saat rekam:** waveform bar bergerak real-time mengikuti amplitude audio (pakai `AudioContext` + `AnalyserNode`, native browser, gratis).
-- **Transisi antar tab:** cukup fade/slide singkat (150–200ms), hindari animasi berlebihan yang terasa "dipaksakan AI".
-- **Streak update:** satu animasi kecil & memuaskan saat streak bertambah (bukan confetti besar-besaran — journaling adalah aktivitas tenang, bukan game).
-- Hormati `prefers-reduced-motion` — matikan animasi non-esensial untuk user yang mengaktifkan setting itu di OS.
+### 3. Widescreen Desktop Studio (≥ 768px)
+* **Sidebar Kiri Persisten (256px):** Logo SVG dinamis, streak meter cekung, tombol cepat rekam, navigasi 4 tab, dan toggle Dark/Light mode instan.
+* **Bento Grid 12-Kolom (7:5):** Kolom utama studio rekam berdampingan dengan kolom pemantik inspirasi (*Prompt Starters*) & spesifikasi AI.
 
-## E. Komponen Kunci (checklist untuk di-build)
+---
 
-- [ ] Tombol rekam (3 state: idle, recording, processing/AI bekerja)
-- [ ] Waveform visualizer (live saat rekam, static/mini di kartu catatan yang punya audio)
-- [ ] Kartu catatan (list view)
-- [ ] Kalender bulanan dengan dot penanda tanggal berisi catatan
-- [ ] Search bar dengan 2 mode (kata kunci / tanya AI) — pertimbangkan toggle atau segmented control, bukan dua search bar terpisah
-- [ ] Modal konfirmasi simpan (dengan/tanpa audio)
-- [ ] Streak indicator (versi kecil di header, versi besar di halaman utama)
-- [ ] Empty state (belum ada catatan sama sekali — jadikan ajakan bertindak, bukan sekadar "no data")
-- [ ] Onboarding flow (2 langkah: frekuensi → jam reminder)
+## D. Gestur & Motion
+
+1. **Horizontal Swipe Navigation:**
+   * Menggeser layar ke kiri atau kanan memicu perpindahan tab secara instan.
+   * Dilengkapi deteksi ambang jarak (60px) dan perbandingan sumbu $X > 1.5 \times Y$ agar tidak memblokir scroll vertikal.
+2. **Haptic Micro-interactions:**
+   * Getaran *double-pulse* saat memulai rekaman.
+   * Getaran *single-pulse* saat menghentikan rekaman atau berpindah tab.
+3. **Lazy Loading Transitions:**
+   * Komponen `<PageSkeleton />` menampilkan modul bento berdenyut halus selama proses *code-splitting* halaman.
+4. **Reduced Motion:**
+   * Menghormati pengaturan `prefers-reduced-motion` untuk aksesibilitas pengguna.
