@@ -62,7 +62,6 @@ export const RecordPage: React.FC = () => {
 
   useEffect(() => {
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
       if (mediaStream) {
         mediaStream.getTracks().forEach((track) => track.stop());
       }
@@ -71,6 +70,14 @@ export const RecordPage: React.FC = () => {
       }
     };
   }, [mediaStream, audioUrl]);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
 
   const formatTimer = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -469,7 +476,7 @@ export const RecordPage: React.FC = () => {
                 <WaveformDecoration bars={14} active={true} className="h-6" />
                 <div className="space-y-1 text-center">
                   <div className="text-sm font-semibold text-ink">Merapikan Catatan...</div>
-                  <div className="text-xs text-ink-muted font-mono">Gemini 2.5 Flash Engine</div>
+                  <div className="text-xs text-ink-muted font-mono">Gemini 3.1 Flash Engine</div>
                 </div>
               </div>
             )}
@@ -661,9 +668,9 @@ export const RecordPage: React.FC = () => {
               </div>
               <span>Cara Kerja Voice AI</span>
             </div>
-            <p className="text-xs text-ink-muted leading-relaxed">
-              Google Gemini 2.5 Flash mendengar audio rekamanmu secara langsung, merapikan kata-kata pengisi ('eee', 'anu'), dan mempertahankan seluruh detail angka & tanggal tanpa mengubah fakta.
-            </p>
+            <div className="text-sm text-ink-muted leading-relaxed">
+              Google Gemini 3.1 Flash mendengar audio rekamanmu secara langsung, merapikan kata-kata pengisi ('eee', 'anu'), dan mempertahankan seluruh detail angka & tanggal tanpa mengubah fakta.
+            </div>
             <div className="pt-2 flex items-center justify-between text-[11px] font-mono text-accent">
               <span className="neu-pill px-3 py-1">Client-Side Multimodal</span>
               <span className="neu-pill px-3 py-1">Firestore Isolated</span>
