@@ -156,3 +156,19 @@
   - Memastikan responsivitas layout desktop (multi-column fixed sidebar & fluid grid) dan mobile (floating dock bar, touch padding, anti-overflow).
 * **Status:** Selesai & Terverifikasi Build Sukses.
 
+### Tahap 12: Fokus Keamanan Data, Logika RAG Client-Side, dan Stabilisasi UI/AI
+* **Tanggal/Waktu:** 10 Agustus 2026
+* **User Input & Konteks:**
+  - **Setup Infrastruktur BaaS & Keamanan**: "Tolong berikan kode yang efisien dan aman untuk setup Environment Variables Vite. Tulis ulang konfigurasi inisialisasi Firebase... Buatkan aturan keamanan Firestore secara ketat..."
+  - **Pembuatan Core Logic AI Tanya Jurnal**: "Buatkan fungsi askJournalAI(userId, question) di src/lib/ai.ts... AI HANYA menjawab berdasarkan konteks jurnal..."
+  - **Penambahan Guardrails**: "Perbarui System Prompt di askJournalAI. Tambahkan aturan ketat (Guardrails)..."
+  - **Debugging Wiring Integrasi UI**: "Perbaiki komponen React terkait: Hapus data dummy dan petakan data asli... Perbaiki bug timer rekaman yang freeze..."
+  - **Resolusi Agresif Error API Gemini (404 & 429)**: "Hapus seluruh logika fetch dinamis yang rumit... auto-discovery Gemini 3.1 Flash terbaru..."
+  - **Penyambungan Gamifikasi & Streak**: "Gunakan useEffect / onAuthStateChanged untuk memanggil fungsi getUserStreak... Lakukan pencarian global (Global Search) untuk mencari dan mengubah teks informasi usang 'Gemini 2.5 Flash' menjadi 'Gemini 3.1 Flash'..."
+* **Tindakan AI (Antigravity):**
+  - Menerapkan arsitektur zero-trust Firebase Firestore Rules berbasis *user auth uid*.
+  - Menyusun *System Prompt* ketat (*Guardrails*) dan implementasi RAG dari data lokal Firebase untuk interaksi AI Tanya Jurnal.
+  - Memperbaiki konektivitas UI, sinkronisasi state *streak real-time* (dengan `onAuthStateChanged`), dan *bug timer setInterval*.
+  - Menulis dan menimpa fungsi auto-discovery API *models* agar sistem otomatis menargetkan `"gemini-3.1-flash"`, *bypass error 404* (versi usang) maupun *429 Rate Limit* (versi *Free Tier* nol).
+  - Sinkronisasi string statis di UI agar selaras dengan penggunaan mesin Gemini AI versi 3.1.
+* **Status:** Selesai & Terverifikasi Build Sukses.
