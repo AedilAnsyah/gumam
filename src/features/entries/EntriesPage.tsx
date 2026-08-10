@@ -7,8 +7,6 @@ import { getUserEntries } from '../../lib/entries';
 import { auth } from '../../lib/firebase';
 import { generateWeeklyRecapWithGemini } from '../../lib/ai';
 import { ROUTES } from '../../lib/constants';
-import { SAMPLE_ENTRIES } from '../../lib/sampleData';
-
 export const EntriesPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [searchQuery, setSearchQuery] = useState('');
@@ -29,10 +27,10 @@ export const EntriesPage: React.FC = () => {
         if (firestoreEntries.length > 0) {
           setEntries(firestoreEntries);
         } else {
-          setEntries(SAMPLE_ENTRIES);
+          setEntries([]);
         }
       } else {
-        setEntries(SAMPLE_ENTRIES);
+        setEntries([]);
       }
       setLoading(false);
     }
@@ -45,8 +43,9 @@ export const EntriesPage: React.FC = () => {
     try {
       const recapText = await generateWeeklyRecapWithGemini(entries);
       setWeeklyRecap(recapText);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error generating weekly recap:', err);
+      setWeeklyRecap(`Error: ${err.message || 'Gagal memproses data'}`);
     } finally {
       setIsGeneratingRecap(false);
     }

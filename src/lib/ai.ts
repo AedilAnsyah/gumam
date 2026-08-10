@@ -1,5 +1,5 @@
 import { JournalEntry } from '../types';
-import { GEMINI_MODEL, GEMINI_API_BASE_URL, APP_NAME } from './constants';
+import { GEMINI_API_BASE_URL, APP_NAME } from './constants';
 import { getEntriesByUser } from './db';
 
 export interface GeminiProcessResult {
@@ -31,8 +31,45 @@ export function blobToBase64(blob: Blob): Promise<string> {
   });
 }
 
+// Simpan hasil di memori agar hanya di-fetch 1 kali per sesi
+let cachedFlashModel: string | null = null;
+
+export async function getValidFlashModel(): Promise<string> {
+  // Jika sudah ada di cache, langsung kembalikan tanpa memanggil API
+  if (cachedFlashModel) {
+    return cachedFlashModel;
+  }
+
+  try {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+    const data = await response.json();
+    
+    // Prioritaskan mencari model gemini-3.1-flash
+    const availableModels = data.models.filter((m: any) => 
+      m.supportedGenerationMethods?.includes("generateContent") &&
+      m.name.includes("3.1-flash") 
+    );
+
+    if (availableModels.length > 0) {
+      const rawName = availableModels[0].name;
+      const cleanName = rawName.replace('models/', '');
+      
+      // Simpan ke cache
+      cachedFlashModel = cleanName; 
+      console.log("🎯 MODEL TERPILIH (Cached):", cleanName);
+      return cleanName;
+    }
+    
+    return "gemini-3.1-flash";
+  } catch (error) {
+    console.error("❌ Gagal fetch daftar model:", error);
+    return "gemini-3.1-flash";
+  }
+}
+
 /**
- * Panggil Gemini 2.5 Flash Multimodal API untuk Transkripsi & Rangkuman Audio
+ * Panggil Gemini Flash Multimodal API untuk Transkripsi & Rangkuman Audio
  */
 export async function summarizeAudioWithGemini(audioBlob: Blob): Promise<GeminiProcessResult> {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -60,7 +97,8 @@ Tugasmu:
   "tags": ["..."]
 }`;
 
-  const apiUrl = `${GEMINI_API_BASE_URL}/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+  const modelName = await getValidFlashModel();
+  const apiUrl = `${GEMINI_API_BASE_URL}/${modelName}:generateContent?key=${apiKey}`;
 
   const response = await fetch(apiUrl, {
     method: 'POST',
@@ -177,7 +215,8 @@ Aturan Tambahan:
 
   const userPrompt = `PERTANYAAN USER: "${question}"\n\nKUMPULAN CATATAN JURNAL:\n${contextString}`;
 
-  const apiUrl = `${GEMINI_API_BASE_URL}/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+  const modelName = await getValidFlashModel();
+  const apiUrl = `${GEMINI_API_BASE_URL}/${modelName}:generateContent?key=${apiKey}`;
 
   // 4 & 5. API Call & Error Handling
   try {
@@ -234,7 +273,11 @@ export async function generateWeeklyRecapWithGemini(entries: JournalEntry[]): Pr
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
   if (!apiKey || apiKey === 'your_gemini_api_key_here') {
-    return 'Minggu ini kamu paling sering menulis tentang progres proyek kerja dan aktivitas harian. Mood dominanmu cenderung positif dan tenang.';
+    throw new Error('API Key Gemini tidak ditemukan.');
+  }
+
+  if (!entries || entries.length === 0) {
+    return 'Belum ada catatan jurnal minggu ini untuk dirangkum.';
   }
 
   const entriesText = entries
@@ -243,7 +286,8 @@ export async function generateWeeklyRecapWithGemini(entries: JournalEntry[]): Pr
 
   const prompt = `Berikut adalah catatan jurnal pengguna selama minggu ini:\n${entriesText}\n\nBuat 1 paragraf ringkasan apresiatif dalam Bahasa Indonesia (2-3 kalimat) mengenai topik utama yang paling sering ditulis dan tren mood minggu ini (misal: "Minggu ini kamu paling sering menulis tentang...").`;
 
-  const apiUrl = `${GEMINI_API_BASE_URL}/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+  const modelName = await getValidFlashModel();
+  const apiUrl = `${GEMINI_API_BASE_URL}/${modelName}:generateContent?key=${apiKey}`;
 
   const response = await fetch(apiUrl, {
     method: 'POST',
@@ -254,7 +298,7 @@ export async function generateWeeklyRecapWithGemini(entries: JournalEntry[]): Pr
   });
 
   if (!response.ok) {
-    return 'Minggu ini kamu konsisten mencatat refleksi harianmu di Gumam.';
+    throw new Error(`Gagal menghubungi Gemini API (Status ${response.status})`);
   }
 
   const data = await response.json();
