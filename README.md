@@ -2,7 +2,7 @@
 
 > **Kompetisi:** BitsMikro Innovative VibeCode 2026  
 > **Tema:** Kesehatan & Produktivitas  
-> **Cakupan Pengembangan:** Front-End Only (Backend-as-a-Service Firebase + Gemini AI REST API, 100% Gratis)  
+> **Cakupan Pengembangan:** Front-End Only (Backend-as-a-Service Firebase + Gemini AI REST API)  
 
 ![Gumam PWA Banner](https://img.shields.io/badge/Gumam-Voice%20Journaling%20AI-3B828E?style=for-the-badge)
 ![BitsMikro 2026](https://img.shields.io/badge/BitsMikro-VibeCode%202026-1E232B?style=for-the-badge)
@@ -13,7 +13,7 @@
 
 ## 📖 Tentang Project
 
-**Gumam** adalah Progressive Web App (PWA) *voice journaling* berbasis AI yang dirancang untuk meminimalkan friksi mencatat harian. Cukup dengan bicarakan harimu secara alami, **Google Gemini 2.5 Flash Multimodal Engine** akan mentranskripsi ucapan dan merapikan ceritamu menjadi catatan jurnal yang terstruktur, rapi, dan mudah ditelusuri kembali tanpa menghilangkan fakta atau detail emosional.
+**Gumam** adalah Progressive Web App (PWA) *voice journaling* berbasis AI yang dirancang untuk meminimalkan friksi mencatat harian. Cukup dengan bicarakan harimu secara alami, **Google Gemini 3.1 Flash Multimodal Engine** akan mentranskripsi ucapan dan merapikan ceritamu menjadi catatan jurnal yang terstruktur, rapi, dan mudah ditelusuri kembali tanpa menghilangkan fakta atau detail emosional.
 
 Antarmuka Gumam mengadopsi estetika **Neumorphism (Soft UI)** yang taktil dan menenangkan — menggabungkan bayangan ganda halus (*dual soft shadows*), tombol konsentris berundak, navigasi gestur *swipe*, dan sistem tema ganda (Light & Dark Mode) yang 100% menyatu.
 
@@ -28,7 +28,7 @@ Antarmuka Gumam mengadopsi estetika **Neumorphism (Soft UI)** yang taktil dan me
 - **Alternatif Tulis Manual**: Mode ketik manual untuk situasi tidak nyaman berbicara di tempat umum.
 
 ### 🤖 2. Integrasi Multimodal Gemini AI Engine
-- **Audio-to-Text & Summarization**: Gemini 2.5 Flash menerima input audio Base64 secara langsung, menghasilkan transkrip mentah + rangkuman rapi sekaligus dalam 1 request JSON terstruktur.
+- **Audio-to-Text & Summarization**: Gemini 3.1 Flash menerima input audio Base64 secara langsung, menghasilkan transkrip mentah + rangkuman rapi sekaligus dalam 1 request JSON terstruktur.
 - **Review & Edit Screen**: Textarea hasil rangkuman AI dapat dikoreksi manual oleh pengguna sebelum disimpan ke cloud.
 - **Auto Mood & Auto-Tagging**: AI mendeteksi mood dominan (*"Senang"*, *"Fokus"*, *"Lelah"*) dan mengusulkan 1-3 hashtag otomatis (`#Harian`, `#Belanja`).
 - **AI Ringkasan Mingguan**: Menghasilkan 1 paragraf evaluasi tren mood dan topik mingguan dari seluruh catatan pengguna.
@@ -63,14 +63,41 @@ Antarmuka Gumam mengadopsi estetika **Neumorphism (Soft UI)** yang taktil dan me
 
 ---
 
-## 🛠️ Tech Stack (100% Gratis & Client-Side Only)
+## 🏗️ Arsitektur Backend & Logika Sistem
+
+Proyek **Gumam** mengusung arsitektur **Serverless / Backend-as-a-Service (BaaS)** yang sangat optimal untuk Progressive Web App (PWA). Seluruh logika pemrosesan data dan integrasi AI dijalankan secara aman di sisi klien (*Client-Side*) dengan memanfaatkan layanan *cloud*.
+
+### 1. Zero-Friction Authentication (Firebase Auth)
+Aplikasi ini menggunakan metode **Anonymous Authentication** untuk mengurangi hambatan masuk (*friction*) bagi pengguna. 
+* **Sesi Persisten:** Saat pengguna membuka aplikasi, Firebase secara otomatis membuat identitas anonim unik (UID) yang disimpan secara persisten di dalam *IndexedDB browser*.
+* **Privasi:** Pengguna tidak perlu mendaftar menggunakan email atau kata sandi, namun data mereka tetap terkunci dan dikenali di perangkat yang sama, memberikan pengalaman *plug-and-play* yang instan.
+
+### 2. Keamanan Data (Cloud Firestore)
+Seluruh memori jurnal dan rekam jejak konsistensi (*streak*) disimpan pada basis data NoSQL Cloud Firestore. Kami menerapkan lapisan **Firestore Security Rules** yang ketat di level *server* untuk mengamankan data pengguna:
+* **Isolasi Memori:** Sebuah dokumen jurnal hanya dapat dibaca, ditulis, atau diperbarui jika `userId` pada dokumen tersebut identik dengan `request.auth.uid` pengguna yang sedang mengaksesnya.
+* Ini memastikan bahwa meskipun aplikasi berjalan 100% dari *client-side*, tidak ada pengguna yang bisa meretas atau melihat jurnal milik pengguna lain.
+
+### 3. Client-Side RAG (Retrieval-Augmented Generation)
+Fitur "Tanya AI" (Natural Language Search) tidak menggunakan *database vector* atau *server* perantara yang mahal. Kami mengimplementasikan logika RAG ringan di sisi *browser*:
+1. **Retrieval:** Fungsi akan menarik ( *fetch* ) rentetan memori jurnal pengguna langsung dari Firestore.
+2. **Context Formatting:** Data tersebut dipadatkan dan dirangkai menjadi sejarah memori (*context string*).
+3. **Generation:** Konteks disuntikkan ke dalam *System Prompt* API Gemini, menginstruksikan AI untuk berperan sebagai asisten empati dan menjawab pertanyaan **murni berdasarkan fakta** di dalam jurnal tersebut.
+
+### 4. Dynamic AI Model Discovery & Anti-Limit
+Aplikasi terintegrasi langsung dengan **Google Gemini API** (`@google/generative-ai`). Untuk menjaga reliabilitas fitur rangkuman mingguan dan transkripsi, logika API dilengkapi dengan:
+* **Dynamic Routing:** Secara spesifik menggunakan alias `gemini-flash-latest` (atau model 3.1 Flash) untuk memastikan aplikasi selalu mendapatkan model teringan, terstabil, dan memiliki *Free Tier* aktif, guna menghindari *error deprecation* (404) atau kuota habis (429).
+* **Strict Guardrails:** AI dikunci dengan *prompt engineering* khusus untuk menolak instruksi di luar konteks jurnal (Anti-Prompt Injection) dan diwajibkan mengembalikan format data JSON yang terstruktur.
+
+---
+
+## 🛠️ Tech Stack (Client-Side Only)
 
 | Layer | Teknologi | Alasan Pemilihan |
 |---|---|---|
 | **Framework & Build** | React 18 + Vite + TypeScript | Performa cepat, type safety, code-splitting `React.lazy` |
 | **Styling & UI System** | Tailwind CSS + Neumorphic Soft UI Tokens | Desain taktil kustom, dual shadows, dan responsivitas penuh |
 | **BaaS (Auth & DB)** | Firebase Auth (Anonymous) + Firestore + Storage | Isolasi data server rules & offline persistence |
-| **AI Multimodal** | Google Gemini API (`gemini-2.5-flash`) | Multimodal audio-to-text & semantic search natural |
+| **AI Multimodal** | Google Gemini API (`gemini-3.1-flash`) | Multimodal audio-to-text & semantic search natural |
 | **PWA & Gestures** | `vite-plugin-pwa` + Web Notification + Touch API | Installable, service worker, & gesture swipe navigation |
 
 ---
@@ -129,7 +156,7 @@ Gumam/
 ├── public/                     # Icons, logo.svg, favicon.svg & manifest
 ├── src/
 │   ├── assets/                 # High-res logo assets (logo.png, etc.)
-│   ├── components/             # Reusable UI (Navbar, Header, DesktopSidebar, GumamLogo, ThemeToggle, Calendar, Waveform, PageSkeleton)
+│   ├── components/             # Reusable UI (Navbar, Header, DesktopSidebar, GumamLogo, ThemeToggle, JournalCalendar, AudioWaveformVisualizer, PageSkeleton)
 │   ├── features/               # Feature Modules (Lazy Loaded)
 │   │   ├── entries/            # EntriesPage & EntryDetailPage
 │   │   ├── onboarding/         # OnboardingPage (3-step stepper)
@@ -137,7 +164,7 @@ Gumam/
 │   │   ├── search/             # SearchAskPage (AI Tanya Jurnal)
 │   │   ├── settings/           # SettingsPage & Theme Switcher
 │   │   └── streak/             # StreakBadge Component
-│   ├── lib/                    # Core Utilities (ai.ts, firebase.ts, entries.ts, notifications.ts, useSwipe.ts, theme.ts)
+│   ├── lib/                    # Core Utilities (ai.ts, db.ts, firebase.ts, useStreak.ts, useSwipe.ts, exportImport.ts, dll.)
 │   ├── types/                  # TypeScript Type Definitions
 │   ├── App.tsx                 # Responsive Layout, Router, Suspense & Gesture Hook
 │   ├── main.tsx                # React Mount Point
